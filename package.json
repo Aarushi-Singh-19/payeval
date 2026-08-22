@@ -1,0 +1,28 @@
+{
+  "name": "payeval",
+  "version": "1.0.0",
+  "description": "> Test an AI agent before trusting it with money.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aarushi-Singh-19/payeval.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Aarushi-Singh-19/payeval/issues"
+  },
+  "homepage": "https://github.com/Aarushi-Singh-19/payeval#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "dotenv": "^17.4.2"
+  }
+}
