@@ -1,12 +1,14 @@
 const { evaluateAction } = require("./policy-engine");
+const { createExecutionTrace } = require("./execution-trace");
 
 /**
  * Enforce PayEval policy before allowing an MCP tool invocation.
  *
- * Execution outcomes are explicitly classified:
+ * Execution outcomes:
  * - BLOCKED: policy prevented execution
  * - EXECUTED_SUCCESS: policy allowed and MCP tool succeeded
  * - EXECUTED_FAILURE: policy allowed but MCP tool reported an error
+ * - MCP_CONNECTION_FAILURE: policy allowed but MCP connection could not be established
  *
  * The MCP dependency can be supplied either as:
  * - an existing client with callTool(), or
@@ -14,16 +16,40 @@ const { evaluateAction } = require("./policy-engine");
  *
  * This ensures blocked actions never establish an MCP connection.
  */
-async function enforceAction(scenario, actualAction, mcpClientOrFactory) {
-  const evaluation = evaluateAction(scenario, actualAction);
+async function enforceAction(
+  scenario,
+  actualAction,
+  mcpClientOrFactory
+) {
+  const startedAt = new Date().toISOString();
+
+  const evaluation = evaluateAction(
+    scenario,
+    actualAction
+  );
 
   if (evaluation.decision === "BLOCK") {
+    const completedAt = new Date().toISOString();
+
+    const trace = createExecutionTrace({
+      scenario,
+      actualAction,
+      evaluation,
+      executionStatus: "BLOCKED",
+      executed: false,
+      toolSucceeded: false,
+      mcpResult: null,
+      startedAt,
+      completedAt
+    });
+
     return {
       ...evaluation,
       executionStatus: "BLOCKED",
       executed: false,
       toolSucceeded: false,
-      mcpResult: null
+      mcpResult: null,
+      trace
     };
   }
 
@@ -35,10 +61,36 @@ async function enforceAction(scenario, actualAction, mcpClientOrFactory) {
 
   let mcpClient;
 
-  if (typeof mcpClientOrFactory === "function") {
-    mcpClient = await mcpClientOrFactory();
-  } else {
-    mcpClient = mcpClientOrFactory;
+  try {
+    if (typeof mcpClientOrFactory === "function") {
+      mcpClient = await mcpClientOrFactory();
+    } else {
+      mcpClient = mcpClientOrFactory;
+    }
+  } catch (error) {
+    const completedAt = new Date().toISOString();
+
+    const trace = createExecutionTrace({
+      scenario,
+      actualAction,
+      evaluation,
+      executionStatus: "MCP_CONNECTION_FAILURE",
+      executed: false,
+      toolSucceeded: false,
+      mcpResult: null,
+      mcpError: error,
+      startedAt,
+      completedAt
+    });
+
+    return {
+      ...evaluation,
+      executionStatus: "MCP_CONNECTION_FAILURE",
+      executed: false,
+      toolSucceeded: false,
+      mcpResult: null,
+      trace
+    };
   }
 
   if (!mcpClient || typeof mcpClient.callTool !== "function") {
@@ -54,14 +106,31 @@ async function enforceAction(scenario, actualAction, mcpClientOrFactory) {
 
   const toolSucceeded = mcpResult?.isError !== true;
 
-  return {
-    ...evaluation,
-    executionStatus: toolSucceeded
-      ? "EXECUTED_SUCCESS"
-      : "EXECUTED_FAILURE",
+  const executionStatus = toolSucceeded
+    ? "EXECUTED_SUCCESS"
+    : "EXECUTED_FAILURE";
+
+  const completedAt = new Date().toISOString();
+
+  const trace = createExecutionTrace({
+    scenario,
+    actualAction,
+    evaluation,
+    executionStatus,
     executed: true,
     toolSucceeded,
-    mcpResult
+    mcpResult,
+    startedAt,
+    completedAt
+  });
+
+  return {
+    ...evaluation,
+    executionStatus,
+    executed: true,
+    toolSucceeded,
+    mcpResult,
+    trace
   };
 }
 
