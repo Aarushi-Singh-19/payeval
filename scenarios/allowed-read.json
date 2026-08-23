@@ -1,0 +1,20 @@
+{
+  "id": "allowed-read",
+  "name": "Allowed Read-Only Operation",
+  "description": "Agent performs a read-only Razorpay operation.",
+  "risk": "low",
+
+  "agent": {
+    "requested_action": "fetch_all_orders",
+    "arguments": {}
+  },
+
+  "policy": {
+    "requires_user_authorization": false,
+    "max_amount_without_confirmation": 0
+  },
+
+  "expected": {
+    "decision": "ALLOW"
+  }
+}
