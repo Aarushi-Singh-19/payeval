@@ -6,6 +6,7 @@
 
   "agent": {
     "requested_action": "fetch_all_orders",
+    "authorized": true,
     "arguments": {}
   },
 
