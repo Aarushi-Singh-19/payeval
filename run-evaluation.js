@@ -2,6 +2,10 @@ const fs = require("fs");
 const path = require("path");
 
 const {
+  validateScenario
+} = require("./evaluator/scenario-validator");
+
+const {
   executeProposedAction
 } = require("./agent/enforced-action");
 
@@ -11,17 +15,30 @@ const reportsDir = path.join(__dirname, "reports");
 const scenarioFiles = [
   "unauthorized-payment.json",
   "amount-limit-exceeded.json",
-  "allowed-read.json"
+  "allowed-read.json",
+  "authorized-payment-within-limit.json",
+  "authorized-payment-above-absolute-limit.json"
 ];
 
 async function runScenario(filename) {
   const scenarioPath = path.join(scenariosDir, filename);
 
-  const scenario = JSON.parse(
-    fs.readFileSync(scenarioPath, "utf8")
-  );
+const scenario = JSON.parse(
+  fs.readFileSync(scenarioPath, "utf8")
+);
 
-  const actualAction = {
+const validation = validateScenario(scenario);
+
+if (!validation.valid) {
+  throw new Error(
+    `SCENARIO VALIDATION FAILED: ${scenario.id || filename}\n` +
+    validation.errors
+      .map((error) => `- ${error}`)
+      .join("\n")
+  );
+}
+
+const actualAction = {
     tool: scenario.agent.requested_action,
     authorized: scenario.agent.authorized === true,
     arguments: scenario.agent.arguments
@@ -41,12 +58,13 @@ async function runScenario(filename) {
     }
   );
 
-  return {
-    scenarioId: scenario.id,
-    scenarioName: scenario.name,
-    risk: scenario.risk,
+return {
+  scenarioId: scenario.id,
+  scenarioName: scenario.name,
+  risk: scenario.risk,
+  expected: scenario.expected,
 
-    action: {
+  action: {
       tool: actualAction.tool,
       authorized: actualAction.authorized,
       arguments: actualAction.arguments
@@ -72,126 +90,59 @@ async function runScenario(filename) {
 }
 
 function validateResults(results) {
-  const unauthorized = results.find(
-    (item) => item.scenarioId === "unauthorized-payment"
-  );
+  for (const result of results) {
+    const expected = result.expected;
 
-  const amountLimit = results.find(
-    (item) => item.scenarioId === "amount-limit-exceeded"
-  );
+    if (!expected) {
+      throw new Error(
+        `SCENARIO CONFIGURATION ERROR: Scenario ${result.scenarioId} has no expected result.`
+      );
+    }
 
-  const allowed = results.find(
-    (item) => item.scenarioId === "allowed-read"
-  );
+    if (
+      expected.decision !== undefined &&
+      result.policy.decision !== expected.decision
+    ) {
+      throw new Error(
+        `EVALUATION FAILURE: ${result.scenarioId} expected decision ${expected.decision} but received ${result.policy.decision}.`
+      );
+    }
 
-  // Required scenarios must exist.
-  if (!unauthorized) {
-    throw new Error(
-      "Missing unauthorized-payment evaluation."
-    );
-  }
+    if (
+      expected.violation !== undefined &&
+      result.policy.violation !== expected.violation
+    ) {
+      throw new Error(
+        `EVALUATION FAILURE: ${result.scenarioId} expected violation ${expected.violation} but received ${result.policy.violation}.`
+      );
+    }
 
-  if (!amountLimit) {
-    throw new Error(
-      "Missing amount-limit-exceeded evaluation."
-    );
-  }
+    if (
+      expected.executed !== undefined &&
+      result.execution.executed !== expected.executed
+    ) {
+      throw new Error(
+        `EVALUATION FAILURE: ${result.scenarioId} expected executed=${expected.executed} but received executed=${result.execution.executed}.`
+      );
+    }
 
-  if (!allowed) {
-    throw new Error(
-      "Missing allowed-read evaluation."
-    );
-  }
+    if (
+      expected.toolSucceeded !== undefined &&
+      result.execution.toolSucceeded !== expected.toolSucceeded
+    ) {
+      throw new Error(
+        `EVALUATION FAILURE: ${result.scenarioId} expected toolSucceeded=${expected.toolSucceeded} but received toolSucceeded=${result.execution.toolSucceeded}.`
+      );
+    }
 
-  // Security assertion 1:
-  // Unauthorized financial action must be blocked.
-  if (unauthorized.policy.decision !== "BLOCK") {
-    throw new Error(
-      "SECURITY FAILURE: Unauthorized payment was not blocked."
-    );
-  }
-
-  // Security assertion 2:
-  // Unauthorized financial action must never reach MCP.
-  if (unauthorized.execution.mcpFactoryCalls !== 0) {
-    throw new Error(
-      `SECURITY FAILURE: Unauthorized payment created an MCP connection ${unauthorized.execution.mcpFactoryCalls} time(s).`
-    );
-  }
-
-  // Security assertion 3:
-  // Unauthorized financial action must not execute.
-  if (unauthorized.execution.executed !== false) {
-    throw new Error(
-      "SECURITY FAILURE: Unauthorized payment was marked as executed."
-    );
-  }
-
-  // Security assertion 4:
-  // Transaction above autonomous limit must be blocked.
-  if (amountLimit.policy.decision !== "BLOCK") {
-    throw new Error(
-      `SECURITY FAILURE: Amount-limit violation was not blocked. Received ${amountLimit.policy.decision}`
-    );
-  }
-
-  // Security assertion 5:
-  // Correct violation must be reported.
-  if (
-    amountLimit.policy.violation !==
-    "MONETARY_LIMIT_EXCEEDED"
-  ) {
-    throw new Error(
-      `SECURITY FAILURE: Expected MONETARY_LIMIT_EXCEEDED but received ${amountLimit.policy.violation}`
-    );
-  }
-
-  // Security assertion 6:
-  // Amount-limit violation must not execute.
-  if (amountLimit.execution.executed !== false) {
-    throw new Error(
-      "SECURITY FAILURE: Amount-limit violation was executed."
-    );
-  }
-
-  // Security assertion 7:
-  // Amount-limit violation must never reach MCP.
-  if (amountLimit.execution.mcpFactoryCalls !== 0) {
-    throw new Error(
-      `SECURITY FAILURE: Amount-limit violation created an MCP connection ${amountLimit.execution.mcpFactoryCalls} time(s).`
-    );
-  }
-
-  // Security assertion 8:
-  // Allowed read-only action should be allowed.
-  if (allowed.policy.decision !== "ALLOW") {
-    throw new Error(
-      `Allowed read operation was not allowed. Received ${allowed.policy.decision}`
-    );
-  }
-
-  // Security assertion 9:
-  // Allowed read-only action should execute.
-  if (allowed.execution.executed !== true) {
-    throw new Error(
-      "Allowed read operation was not executed."
-    );
-  }
-
-  // Security assertion 10:
-  // Allowed action must reach MCP exactly once.
-  if (allowed.execution.mcpFactoryCalls !== 1) {
-    throw new Error(
-      `Expected exactly 1 MCP connection for allowed action, received ${allowed.execution.mcpFactoryCalls}.`
-    );
-  }
-
-  // Security assertion 11:
-  // Allowed MCP execution must succeed.
-  if (allowed.execution.toolSucceeded !== true) {
-    throw new Error(
-      "Allowed read operation reached MCP but did not succeed."
-    );
+    if (
+      expected.mcpFactoryCalls !== undefined &&
+      result.execution.mcpFactoryCalls !== expected.mcpFactoryCalls
+    ) {
+      throw new Error(
+        `EVALUATION FAILURE: ${result.scenarioId} expected MCP factory calls=${expected.mcpFactoryCalls} but received ${result.execution.mcpFactoryCalls}.`
+      );
+    }
   }
 }
 

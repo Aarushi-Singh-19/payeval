@@ -1,0 +1,172 @@
+function validateScenario(scenario) {
+  const errors = [];
+
+  if (!scenario || typeof scenario !== "object") {
+    return {
+      valid: false,
+      errors: ["Scenario must be an object."]
+    };
+  }
+
+  // Top-level fields
+  if (typeof scenario.id !== "string" || scenario.id.trim() === "") {
+    errors.push("Scenario 'id' must be a non-empty string.");
+  }
+
+  if (
+    typeof scenario.name !== "string" ||
+    scenario.name.trim() === ""
+  ) {
+    errors.push("Scenario 'name' must be a non-empty string.");
+  }
+
+  if (
+    typeof scenario.risk !== "string" ||
+    !["low", "medium", "high", "critical"].includes(
+      scenario.risk
+    )
+  ) {
+    errors.push(
+      "Scenario 'risk' must be one of: low, medium, high, critical."
+    );
+  }
+
+  // Agent
+  if (!scenario.agent || typeof scenario.agent !== "object") {
+    errors.push("Scenario must contain an 'agent' object.");
+  } else {
+    if (
+      typeof scenario.agent.requested_action !== "string" ||
+      scenario.agent.requested_action.trim() === ""
+    ) {
+      errors.push(
+        "Agent 'requested_action' must be a non-empty string."
+      );
+    }
+
+    if (typeof scenario.agent.authorized !== "boolean") {
+      errors.push(
+        "Agent 'authorized' must be a boolean."
+      );
+    }
+
+    if (
+      !scenario.agent.arguments ||
+      typeof scenario.agent.arguments !== "object" ||
+      Array.isArray(scenario.agent.arguments)
+    ) {
+      errors.push(
+        "Agent 'arguments' must be an object."
+      );
+    }
+  }
+
+  // Policy
+  if (!scenario.policy || typeof scenario.policy !== "object") {
+    errors.push("Scenario must contain a 'policy' object.");
+  } else {
+    if (
+      typeof scenario.policy.requires_user_authorization !==
+      "boolean"
+    ) {
+      errors.push(
+        "Policy 'requires_user_authorization' must be a boolean."
+      );
+    }
+
+    if (
+      typeof scenario.policy.max_amount_without_confirmation !==
+        "number" ||
+      scenario.policy.max_amount_without_confirmation < 0
+    ) {
+      errors.push(
+        "Policy 'max_amount_without_confirmation' must be a non-negative number."
+      );
+    }
+
+    if (
+  scenario.policy.max_transaction_amount !== undefined &&
+  (
+    typeof scenario.policy.max_transaction_amount !== "number" ||
+    scenario.policy.max_transaction_amount < 0
+  )
+) {
+  errors.push(
+    "Policy 'max_transaction_amount' must be a non-negative number when provided."
+  );
+}
+  }
+
+  // Expected result
+  if (
+    !scenario.expected ||
+    typeof scenario.expected !== "object"
+  ) {
+    errors.push(
+      "Scenario must contain an 'expected' object."
+    );
+  } else {
+    const allowedDecisions = ["ALLOW", "BLOCK"];
+
+    if (
+      !allowedDecisions.includes(
+        scenario.expected.decision
+      )
+    ) {
+      errors.push(
+        "Expected 'decision' must be either ALLOW or BLOCK."
+      );
+    }
+
+    if (
+      scenario.expected.violation !== undefined &&
+      typeof scenario.expected.violation !== "string"
+    ) {
+      errors.push(
+        "Expected 'violation' must be a string when provided."
+      );
+    }
+
+    if (
+      scenario.expected.executed !== undefined &&
+      typeof scenario.expected.executed !== "boolean"
+    ) {
+      errors.push(
+        "Expected 'executed' must be a boolean when provided."
+      );
+    }
+
+    if (
+      scenario.expected.toolSucceeded !== undefined &&
+      typeof scenario.expected.toolSucceeded !== "boolean"
+    ) {
+      errors.push(
+        "Expected 'toolSucceeded' must be a boolean when provided."
+      );
+    }
+
+    if (
+      scenario.expected.mcpFactoryCalls !== undefined &&
+      (
+        typeof scenario.expected.mcpFactoryCalls !== "number" ||
+        !Number.isInteger(
+          scenario.expected.mcpFactoryCalls
+        ) ||
+        scenario.expected.mcpFactoryCalls < 0
+      )
+    ) {
+      errors.push(
+        "Expected 'mcpFactoryCalls' must be a non-negative integer when provided."
+      );
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+module.exports = {
+  validateScenario
+};
