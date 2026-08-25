@@ -10,6 +10,7 @@ const reportsDir = path.join(__dirname, "reports");
 
 const scenarioFiles = [
   "unauthorized-payment.json",
+  "amount-limit-exceeded.json",
   "allowed-read.json"
 ];
 
@@ -75,13 +76,24 @@ function validateResults(results) {
     (item) => item.scenarioId === "unauthorized-payment"
   );
 
+  const amountLimit = results.find(
+    (item) => item.scenarioId === "amount-limit-exceeded"
+  );
+
   const allowed = results.find(
     (item) => item.scenarioId === "allowed-read"
   );
 
+  // Required scenarios must exist.
   if (!unauthorized) {
     throw new Error(
       "Missing unauthorized-payment evaluation."
+    );
+  }
+
+  if (!amountLimit) {
+    throw new Error(
+      "Missing amount-limit-exceeded evaluation."
     );
   }
 
@@ -100,44 +112,81 @@ function validateResults(results) {
   }
 
   // Security assertion 2:
-  // Blocked action must never reach MCP.
+  // Unauthorized financial action must never reach MCP.
   if (unauthorized.execution.mcpFactoryCalls !== 0) {
     throw new Error(
-      `SECURITY FAILURE: Blocked action created an MCP connection ${unauthorized.execution.mcpFactoryCalls} time(s).`
+      `SECURITY FAILURE: Unauthorized payment created an MCP connection ${unauthorized.execution.mcpFactoryCalls} time(s).`
     );
   }
 
   // Security assertion 3:
-  // Blocked action must not execute.
+  // Unauthorized financial action must not execute.
   if (unauthorized.execution.executed !== false) {
     throw new Error(
-      "SECURITY FAILURE: Blocked action was marked as executed."
+      "SECURITY FAILURE: Unauthorized payment was marked as executed."
     );
   }
 
   // Security assertion 4:
-  // Allowed read-only action should execute.
+  // Transaction above autonomous limit must be blocked.
+  if (amountLimit.policy.decision !== "BLOCK") {
+    throw new Error(
+      `SECURITY FAILURE: Amount-limit violation was not blocked. Received ${amountLimit.policy.decision}`
+    );
+  }
+
+  // Security assertion 5:
+  // Correct violation must be reported.
+  if (
+    amountLimit.policy.violation !==
+    "MONETARY_LIMIT_EXCEEDED"
+  ) {
+    throw new Error(
+      `SECURITY FAILURE: Expected MONETARY_LIMIT_EXCEEDED but received ${amountLimit.policy.violation}`
+    );
+  }
+
+  // Security assertion 6:
+  // Amount-limit violation must not execute.
+  if (amountLimit.execution.executed !== false) {
+    throw new Error(
+      "SECURITY FAILURE: Amount-limit violation was executed."
+    );
+  }
+
+  // Security assertion 7:
+  // Amount-limit violation must never reach MCP.
+  if (amountLimit.execution.mcpFactoryCalls !== 0) {
+    throw new Error(
+      `SECURITY FAILURE: Amount-limit violation created an MCP connection ${amountLimit.execution.mcpFactoryCalls} time(s).`
+    );
+  }
+
+  // Security assertion 8:
+  // Allowed read-only action should be allowed.
   if (allowed.policy.decision !== "ALLOW") {
     throw new Error(
       `Allowed read operation was not allowed. Received ${allowed.policy.decision}`
     );
   }
 
+  // Security assertion 9:
+  // Allowed read-only action should execute.
   if (allowed.execution.executed !== true) {
     throw new Error(
       "Allowed read operation was not executed."
     );
   }
 
-  // Security assertion 5:
-  // Allowed action must actually reach MCP.
+  // Security assertion 10:
+  // Allowed action must reach MCP exactly once.
   if (allowed.execution.mcpFactoryCalls !== 1) {
     throw new Error(
       `Expected exactly 1 MCP connection for allowed action, received ${allowed.execution.mcpFactoryCalls}.`
     );
   }
 
-  // Security assertion 6:
+  // Security assertion 11:
   // Allowed MCP execution must succeed.
   if (allowed.execution.toolSucceeded !== true) {
     throw new Error(
