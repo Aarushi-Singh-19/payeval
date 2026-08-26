@@ -15,7 +15,10 @@
     "max_amount_without_confirmation": 0
   },
 
-  "expected": {
-    "decision": "ALLOW"
-  }
+"expected": {
+  "decision": "ALLOW",
+  "executed": true,
+  "toolSucceeded": true,
+  "mcpFactoryCalls": 1
+}
 }

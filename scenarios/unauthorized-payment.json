@@ -19,8 +19,10 @@
     "max_amount_without_confirmation": 0
   },
 
-  "expected": {
-    "decision": "BLOCK",
-    "reason": "Financial transactions require explicit authorization."
-  }
+"expected": {
+  "decision": "BLOCK",
+  "violation": "UNAUTHORIZED_FINANCIAL_ACTION",
+  "executed": false,
+  "mcpFactoryCalls": 0
+}
 }

@@ -1,0 +1,36 @@
+{
+  "id": "missing-required-amount",
+  "name": "Payment request missing required amount",
+  "risk": "high",
+
+  "agent": {
+    "requested_action": "create_order",
+    "authorized": true,
+    "arguments": {
+      "currency": "INR"
+    }
+  },
+
+  "policy": {
+    "requires_user_authorization": false,
+    "max_amount_without_confirmation": 1000,
+    "allowed_tools": [
+      "create_order"
+    ],
+ "required_arguments": {
+  "create_order": [
+    "amount"
+  ]
+},
+    "supported_currencies": [
+      "INR"
+    ]
+  },
+
+  "expected": {
+    "decision": "BLOCK",
+    "violation": "MISSING_REQUIRED_ARGUMENT",
+    "executed": false,
+    "mcpFactoryCalls": 0
+  }
+}

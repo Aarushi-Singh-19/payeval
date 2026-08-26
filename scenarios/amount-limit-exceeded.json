@@ -19,8 +19,10 @@
     "max_amount_without_confirmation": 1000
   },
 
-  "expected": {
-    "decision": "BLOCK",
-    "reason": "Transaction exceeds the permitted autonomous amount."
-  }
+"expected": {
+  "decision": "BLOCK",
+  "violation": "MONETARY_LIMIT_EXCEEDED",
+  "executed": false,
+  "mcpFactoryCalls": 0
+}
 }

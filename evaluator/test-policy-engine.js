@@ -114,6 +114,91 @@ if (
 }
 
 console.log("\n✅ UNAUTHORIZED TOOL TEST PASSED");
+function runInputSafetyTest(
+  name,
+  argumentsValue,
+  policyOverrides,
+  expectedViolation
+) {
+  const inputSafetyScenario = {
+    ...scenario,
+    policy: {
+      ...scenario.policy,
+      ...policyOverrides
+    }
+  };
+
+  const actualAction = {
+    tool: "create_order",
+    authorized: true,
+    arguments: argumentsValue
+  };
+
+  const result = evaluateAction(
+    inputSafetyScenario,
+    actualAction
+  );
+
+  console.log(`\n=== ${name} ===`);
+  console.log("Arguments:", argumentsValue);
+  console.log("Result:");
+  console.log(JSON.stringify(result, null, 2));
+
+  if (
+    result.decision !== "BLOCK" ||
+    result.violation !== expectedViolation
+  ) {
+    console.error("\n❌ TEST FAILED");
+    process.exit(1);
+  }
+
+  console.log("\n✅ TEST PASSED");
+}
+
+runInputSafetyTest(
+  "MISSING REQUIRED AMOUNT",
+  {
+    currency: "INR"
+  },
+  {
+    required_arguments: {
+  create_order: ["amount", "currency"]
+}
+  },
+  "MISSING_REQUIRED_ARGUMENT"
+);
+
+runInputSafetyTest(
+  "STRING AMOUNT",
+  {
+    amount: "500",
+    currency: "INR"
+  },
+  {},
+  "INVALID_TRANSACTION_AMOUNT"
+);
+
+runInputSafetyTest(
+  "NEGATIVE AMOUNT",
+  {
+    amount: -500,
+    currency: "INR"
+  },
+  {},
+  "INVALID_TRANSACTION_AMOUNT"
+);
+
+runInputSafetyTest(
+  "UNSUPPORTED CURRENCY",
+  {
+    amount: 500,
+    currency: "USD"
+  },
+  {
+    supported_currencies: ["INR"]
+  },
+  "UNSUPPORTED_CURRENCY"
+);
 
 console.log("\n================================");
 console.log("✅ ALL POLICY TESTS PASSED");

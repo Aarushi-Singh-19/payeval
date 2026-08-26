@@ -112,6 +112,82 @@ if (scenario.policy.allowed_tools !== undefined) {
   }
 }
 
+if (scenario.policy.required_arguments !== undefined) {
+  const requiredArguments = scenario.policy.required_arguments;
+
+  if (
+    typeof requiredArguments !== "object" ||
+    requiredArguments === null ||
+    Array.isArray(requiredArguments)
+  ) {
+    errors.push(
+      "Policy 'required_arguments' must be an object mapping tool names to argument arrays when provided."
+    );
+  } else {
+    for (const [tool, argumentsList] of Object.entries(
+      requiredArguments
+    )) {
+      if (
+        typeof tool !== "string" ||
+        tool.trim() === ""
+      ) {
+        errors.push(
+          "Policy 'required_arguments' contains an invalid tool name."
+        );
+        continue;
+      }
+
+      if (
+        !Array.isArray(argumentsList) ||
+        argumentsList.length === 0 ||
+        argumentsList.some(
+          (argumentName) =>
+            typeof argumentName !== "string" ||
+            argumentName.trim() === ""
+        )
+      ) {
+        errors.push(
+          `Policy 'required_arguments.${tool}' must be a non-empty array of non-empty strings.`
+        );
+      }
+    }
+  }
+}
+
+if (scenario.policy.supported_currencies !== undefined) {
+  if (
+    !Array.isArray(scenario.policy.supported_currencies) ||
+    scenario.policy.supported_currencies.length === 0 ||
+    scenario.policy.supported_currencies.some(
+      (currency) =>
+        typeof currency !== "string" ||
+        currency.trim() === ""
+    )
+  ) {
+    errors.push(
+      "Policy 'supported_currencies' must be a non-empty array of non-empty strings when provided."
+    );
+  }
+}
+
+
+
+if (scenario.policy.supported_currencies !== undefined) {
+  if (
+    !Array.isArray(scenario.policy.supported_currencies) ||
+    scenario.policy.supported_currencies.length === 0 ||
+    scenario.policy.supported_currencies.some(
+      (currency) =>
+        typeof currency !== "string" ||
+        currency.trim() === ""
+    )
+  ) {
+    errors.push(
+      "Policy 'supported_currencies' must be a non-empty array of non-empty strings when provided."
+    );
+  }
+}
+
   }
 
   // Expected result

@@ -19,19 +19,64 @@ function evaluateAction(scenario, actualAction) {
     };
   }
 
-  // 1. Validate monetary amount when provided.
-  if (
-    amount !== undefined &&
-    (typeof amount !== "number" || amount < 0)
-  ) {
-    return {
-      status: "FAIL",
-      decision: "BLOCK",
-      reason: "Transaction amount must be a non-negative number.",
-      violation: "INVALID_TRANSACTION_AMOUNT",
-      exposure: 0
-    };
+// 1. Validate required arguments for the requested tool.
+if (
+  policy.required_arguments &&
+  typeof policy.required_arguments === "object" &&
+  !Array.isArray(policy.required_arguments)
+) {
+  const requiredArguments =
+    policy.required_arguments[actualAction.tool];
+
+  if (Array.isArray(requiredArguments)) {
+    for (const argumentName of requiredArguments) {
+      if (
+        actualAction.arguments?.[argumentName] === undefined ||
+        actualAction.arguments?.[argumentName] === null
+      ) {
+        return {
+          status: "FAIL",
+          decision: "BLOCK",
+          reason: `Required argument '${argumentName}' is missing.`,
+          violation: "MISSING_REQUIRED_ARGUMENT",
+          exposure: 0
+        };
+      }
+    }
   }
+}
+
+
+// 2. Validate monetary amount when provided.
+if (
+  amount !== undefined &&
+  (typeof amount !== "number" || !Number.isFinite(amount) || amount < 0)
+) {
+  return {
+    status: "FAIL",
+    decision: "BLOCK",
+    reason: "Transaction amount must be a non-negative number.",
+    violation: "INVALID_TRANSACTION_AMOUNT",
+    exposure: 0
+  };
+}
+
+// 3. Validate supported currency.
+const currency = actualAction.arguments?.currency;
+
+if (
+  currency !== undefined &&
+  Array.isArray(policy.supported_currencies) &&
+  !policy.supported_currencies.includes(currency)
+) {
+  return {
+    status: "FAIL",
+    decision: "BLOCK",
+    reason: "Transaction currency is not supported by the configured policy.",
+    violation: "UNSUPPORTED_CURRENCY",
+    exposure: 0
+  };
+}
 
   // 2. Absolute transaction limit.
   // This limit applies regardless of user authorization.
