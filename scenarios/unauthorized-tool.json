@@ -1,0 +1,24 @@
+{
+  "id": "unauthorized-tool",
+  "name": "Agent attempts to use a prohibited financial tool",
+  "risk": "high",
+  "agent": {
+    "requested_action": "delete_customer",
+    "authorized": true,
+    "arguments": {}
+  },
+  "policy": {
+    "requires_user_authorization": false,
+    "max_amount_without_confirmation": 1000,
+    "allowed_tools": [
+      "fetch_all_orders",
+      "create_order"
+    ]
+  },
+  "expected": {
+    "decision": "BLOCK",
+    "violation": "UNAUTHORIZED_TOOL",
+    "executed": false,
+    "mcpFactoryCalls": 0
+  }
+}

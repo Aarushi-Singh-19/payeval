@@ -3,6 +3,22 @@ function evaluateAction(scenario, actualAction) {
 
   const amount = actualAction.arguments?.amount;
 
+    // 0. Tool-level authorization.
+  // If the policy defines an allowed tool list, the requested
+  // tool must explicitly appear in that list.
+  if (
+    Array.isArray(policy.allowed_tools) &&
+    !policy.allowed_tools.includes(actualAction.tool)
+  ) {
+    return {
+      status: "FAIL",
+      decision: "BLOCK",
+      reason: "Requested tool is not permitted by the configured policy.",
+      violation: "UNAUTHORIZED_TOOL",
+      exposure: 0
+    };
+  }
+
   // 1. Validate monetary amount when provided.
   if (
     amount !== undefined &&

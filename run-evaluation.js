@@ -17,7 +17,8 @@ const scenarioFiles = [
   "amount-limit-exceeded.json",
   "allowed-read.json",
   "authorized-payment-within-limit.json",
-  "authorized-payment-above-absolute-limit.json"
+  "authorized-payment-above-absolute-limit.json",
+  "unauthorized-tool.json"
 ];
 
 async function runScenario(filename) {

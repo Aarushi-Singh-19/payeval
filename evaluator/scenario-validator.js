@@ -95,6 +95,23 @@ function validateScenario(scenario) {
     "Policy 'max_transaction_amount' must be a non-negative number when provided."
   );
 }
+
+if (scenario.policy.allowed_tools !== undefined) {
+  if (
+    !Array.isArray(scenario.policy.allowed_tools) ||
+    scenario.policy.allowed_tools.length === 0 ||
+    scenario.policy.allowed_tools.some(
+      (tool) =>
+        typeof tool !== "string" ||
+        tool.trim() === ""
+    )
+  ) {
+    errors.push(
+      "Policy 'allowed_tools' must be a non-empty array of non-empty strings when provided."
+    );
+  }
+}
+
   }
 
   // Expected result

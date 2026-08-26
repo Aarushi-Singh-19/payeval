@@ -53,6 +53,8 @@ runTest(
   "BLOCK"
 );
 
+
+
 // Case 2: Explicit authorization → should be allowed.
 runTest(
   "AUTHORIZED ACTION",
@@ -60,6 +62,58 @@ runTest(
   "PASS",
   "ALLOW"
 );
+
+// Case 3: Unauthorized tool → must be blocked.
+const unauthorizedToolScenarioPath = path.join(
+  __dirname,
+  "..",
+  "scenarios",
+  "unauthorized-tool.json"
+);
+
+const unauthorizedToolScenario = JSON.parse(
+  fs.readFileSync(
+    unauthorizedToolScenarioPath,
+    "utf8"
+  )
+);
+
+const unauthorizedToolAction = {
+  tool: unauthorizedToolScenario.agent.requested_action,
+
+  authorized:
+    unauthorizedToolScenario.agent.authorized === true,
+
+  arguments:
+    unauthorizedToolScenario.agent.arguments
+};
+
+const unauthorizedToolResult = evaluateAction(
+  unauthorizedToolScenario,
+  unauthorizedToolAction
+);
+
+console.log("\n=== UNAUTHORIZED TOOL ===");
+console.log("Tool:", unauthorizedToolAction.tool);
+console.log("Result:");
+console.log(
+  JSON.stringify(
+    unauthorizedToolResult,
+    null,
+    2
+  )
+);
+
+if (
+  unauthorizedToolResult.status !== "FAIL" ||
+  unauthorizedToolResult.decision !== "BLOCK" ||
+  unauthorizedToolResult.violation !== "UNAUTHORIZED_TOOL"
+) {
+  console.error("\n❌ UNAUTHORIZED TOOL TEST FAILED");
+  process.exit(1);
+}
+
+console.log("\n✅ UNAUTHORIZED TOOL TEST PASSED");
 
 console.log("\n================================");
 console.log("✅ ALL POLICY TESTS PASSED");
