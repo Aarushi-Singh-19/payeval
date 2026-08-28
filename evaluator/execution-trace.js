@@ -75,10 +75,11 @@ function createExecutionTrace({
     scenarioId: scenario.id,
     timestamp: completedAt,
 
-    action: {
-      tool: actualAction.tool,
-      arguments: actualAction.arguments ?? {}
-    },
+  action: {
+  tool: actualAction.tool,
+  authorized: actualAction.authorized === true,
+  arguments: actualAction.arguments ?? {}
+},
 
     policy: {
       decision: evaluation.decision,

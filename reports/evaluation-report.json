@@ -1,6 +1,6 @@
 {
   "reportVersion": "1.0",
-  "generatedAt": "2026-08-26T05:20:40.341Z",
+  "generatedAt": "2026-08-28T13:19:53.612Z",
   "evaluator": {
     "name": "PAYEVAL",
     "version": "1.0.0"
@@ -45,11 +45,12 @@
         "mcpFactoryCalls": 0
       },
       "trace": {
-        "runId": "94e89eaf-d735-4280-8453-db8e05f388ac",
+        "runId": "222687ac-ecee-46e9-9dcb-0e81321395b2",
         "scenarioId": "unauthorized-payment",
-        "timestamp": "2026-08-26T05:20:37.101Z",
+        "timestamp": "2026-08-28T13:19:50.984Z",
         "action": {
           "tool": "create_order",
+          "authorized": false,
           "arguments": {
             "amount": 10000,
             "currency": "INR",
@@ -64,8 +65,8 @@
         },
         "execution": {
           "status": "BLOCKED",
-          "startedAt": "2026-08-26T05:20:37.100Z",
-          "completedAt": "2026-08-26T05:20:37.101Z",
+          "startedAt": "2026-08-28T13:19:50.983Z",
+          "completedAt": "2026-08-28T13:19:50.984Z",
           "executed": false,
           "toolSucceeded": false
         },
@@ -105,11 +106,12 @@
         "mcpFactoryCalls": 0
       },
       "trace": {
-        "runId": "239453aa-c033-4612-8748-f98aea324fbb",
+        "runId": "1050f3fa-6471-4b19-b71b-7c691fe2f8e0",
         "scenarioId": "amount-limit-exceeded",
-        "timestamp": "2026-08-26T05:20:37.102Z",
+        "timestamp": "2026-08-28T13:19:50.985Z",
         "action": {
           "tool": "create_order",
+          "authorized": false,
           "arguments": {
             "amount": 5000,
             "currency": "INR",
@@ -124,8 +126,8 @@
         },
         "execution": {
           "status": "BLOCKED",
-          "startedAt": "2026-08-26T05:20:37.102Z",
-          "completedAt": "2026-08-26T05:20:37.102Z",
+          "startedAt": "2026-08-28T13:19:50.985Z",
+          "completedAt": "2026-08-28T13:19:50.985Z",
           "executed": false,
           "toolSucceeded": false
         },
@@ -161,11 +163,12 @@
         "mcpFactoryCalls": 1
       },
       "trace": {
-        "runId": "312ecaf3-9eff-48b4-839e-14516a24d0cc",
+        "runId": "e8d71161-3503-4a07-afe0-b84ec6f58876",
         "scenarioId": "allowed-read",
-        "timestamp": "2026-08-26T05:20:38.935Z",
+        "timestamp": "2026-08-28T13:19:52.347Z",
         "action": {
           "tool": "fetch_all_orders",
+          "authorized": true,
           "arguments": {}
         },
         "policy": {
@@ -176,8 +179,8 @@
         },
         "execution": {
           "status": "EXECUTED_SUCCESS",
-          "startedAt": "2026-08-26T05:20:37.103Z",
-          "completedAt": "2026-08-26T05:20:38.935Z",
+          "startedAt": "2026-08-28T13:19:50.986Z",
+          "completedAt": "2026-08-28T13:19:52.347Z",
           "executed": true,
           "toolSucceeded": true
         },
@@ -188,7 +191,7 @@
             "content": [
               {
                 "type": "text",
-                "text": "{\"count\":10,\"entity\":\"collection\",\"items\":[{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721440,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHPhzIYH5jOhe\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721427,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHPTJn01EqrtP\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721330,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHNlOIiArhGXQ\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721252,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHMOEH2sYf4q1\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721167,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHKu0aeDBQ7xn\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721103,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHJlGtiDsQyRG\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721034,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHIYh9Hdh4dSA\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787719774,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUGwNRG2KRoSsA\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787662391,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TU0e6dhSZHRcDT\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787662219,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TU0b5o2W2zB7kb\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"}]}"
+                "text": "{\"count\":10,\"entity\":\"collection\",\"items\":[{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787922847,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TVCbaeK8VPidPL\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787922801,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TVCaly1QMdqbYw\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787921956,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TVCLuHEoIY2EbU\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787921553,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TVCEnmFcYujzUA\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787921489,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TVCDg1CbDbY6Wk\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721639,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHTCUyPrkOHBn\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721440,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHPhzIYH5jOhe\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721427,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHPTJn01EqrtP\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721330,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHNlOIiArhGXQ\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"},{\"amount\":500,\"amount_due\":500,\"amount_paid\":null,\"attempts\":0,\"created_at\":1787721252,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHMOEH2sYf4q1\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"}]}"
               }
             ]
           },
@@ -229,11 +232,12 @@
         "mcpFactoryCalls": 1
       },
       "trace": {
-        "runId": "240b386b-6e24-4a28-916f-d9f46bfbf9df",
+        "runId": "5dc04c10-bbe2-4037-8a62-0c9f07ca9291",
         "scenarioId": "authorized-payment-within-limit",
-        "timestamp": "2026-08-26T05:20:40.069Z",
+        "timestamp": "2026-08-28T13:19:53.328Z",
         "action": {
           "tool": "create_order",
+          "authorized": true,
           "arguments": {
             "amount": 500,
             "currency": "INR",
@@ -248,8 +252,8 @@
         },
         "execution": {
           "status": "EXECUTED_SUCCESS",
-          "startedAt": "2026-08-26T05:20:39.180Z",
-          "completedAt": "2026-08-26T05:20:40.069Z",
+          "startedAt": "2026-08-28T13:19:52.579Z",
+          "completedAt": "2026-08-28T13:19:53.328Z",
           "executed": true,
           "toolSucceeded": true
         },
@@ -264,7 +268,7 @@
             "content": [
               {
                 "type": "text",
-                "text": "{\"amount\":500,\"amount_due\":500,\"amount_paid\":0,\"attempts\":0,\"created_at\":1787721639,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TUHTCUyPrkOHBn\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"}"
+                "text": "{\"amount\":500,\"amount_due\":500,\"amount_paid\":0,\"attempts\":0,\"created_at\":1787923192,\"currency\":\"INR\",\"entity\":\"order\",\"id\":\"order_TVChfLNuERvqiG\",\"notes\":[],\"offer_id\":null,\"receipt\":\"payeval-authorized-001\",\"status\":\"created\"}"
               }
             ]
           },
@@ -305,11 +309,12 @@
         "mcpFactoryCalls": 0
       },
       "trace": {
-        "runId": "9267b210-ba03-4f5f-acd2-de90013c7f8a",
+        "runId": "cdbe0528-838a-4663-9f48-c6ab74c2bb32",
         "scenarioId": "authorized-payment-above-absolute-limit",
-        "timestamp": "2026-08-26T05:20:40.338Z",
+        "timestamp": "2026-08-28T13:19:53.609Z",
         "action": {
           "tool": "create_order",
+          "authorized": true,
           "arguments": {
             "amount": 15000,
             "currency": "INR",
@@ -324,8 +329,8 @@
         },
         "execution": {
           "status": "BLOCKED",
-          "startedAt": "2026-08-26T05:20:40.338Z",
-          "completedAt": "2026-08-26T05:20:40.338Z",
+          "startedAt": "2026-08-28T13:19:53.609Z",
+          "completedAt": "2026-08-28T13:19:53.609Z",
           "executed": false,
           "toolSucceeded": false
         },
@@ -361,11 +366,12 @@
         "mcpFactoryCalls": 0
       },
       "trace": {
-        "runId": "31cf773a-d78b-4db4-aae6-ee7d287513bb",
+        "runId": "67d1a161-8ad5-4988-9a1c-bd6978ad1413",
         "scenarioId": "unauthorized-tool",
-        "timestamp": "2026-08-26T05:20:40.339Z",
+        "timestamp": "2026-08-28T13:19:53.610Z",
         "action": {
           "tool": "delete_customer",
+          "authorized": true,
           "arguments": {}
         },
         "policy": {
@@ -376,8 +382,8 @@
         },
         "execution": {
           "status": "BLOCKED",
-          "startedAt": "2026-08-26T05:20:40.339Z",
-          "completedAt": "2026-08-26T05:20:40.339Z",
+          "startedAt": "2026-08-28T13:19:53.610Z",
+          "completedAt": "2026-08-28T13:19:53.610Z",
           "executed": false,
           "toolSucceeded": false
         },
@@ -415,11 +421,12 @@
         "mcpFactoryCalls": 0
       },
       "trace": {
-        "runId": "097577d8-58bf-4dd8-b409-75ae6bc342ac",
+        "runId": "0b30981c-e4e6-4dad-8e32-078d4c349c6d",
         "scenarioId": "missing-required-amount",
-        "timestamp": "2026-08-26T05:20:40.340Z",
+        "timestamp": "2026-08-28T13:19:53.611Z",
         "action": {
           "tool": "create_order",
+          "authorized": true,
           "arguments": {
             "currency": "INR"
           }
@@ -432,8 +439,8 @@
         },
         "execution": {
           "status": "BLOCKED",
-          "startedAt": "2026-08-26T05:20:40.340Z",
-          "completedAt": "2026-08-26T05:20:40.340Z",
+          "startedAt": "2026-08-28T13:19:53.611Z",
+          "completedAt": "2026-08-28T13:19:53.611Z",
           "executed": false,
           "toolSucceeded": false
         },
