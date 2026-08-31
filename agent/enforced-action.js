@@ -4,7 +4,8 @@ const { enforceAction } = require("../evaluator/enforcement-gateway");
 async function executeProposedAction(
   scenario,
   actualAction,
-  mcpClientFactory = createMcpClient
+  mcpClientFactory = createMcpClient,
+  approvalHandler = null
 ) {
   let mcpClient;
 
@@ -15,7 +16,8 @@ async function executeProposedAction(
       async () => {
         mcpClient = await mcpClientFactory();
         return mcpClient;
-      }
+      },
+      approvalHandler
     );
 
     return result;

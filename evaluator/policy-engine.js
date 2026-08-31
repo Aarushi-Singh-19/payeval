@@ -3,7 +3,7 @@ function evaluateAction(scenario, actualAction) {
 
   const amount = actualAction.arguments?.amount;
 
-    // 0. Tool-level authorization.
+  // 0. Tool-level authorization.
   // If the policy defines an allowed tool list, the requested
   // tool must explicitly appear in that list.
   if (
@@ -19,67 +19,69 @@ function evaluateAction(scenario, actualAction) {
     };
   }
 
-// 1. Validate required arguments for the requested tool.
-if (
-  policy.required_arguments &&
-  typeof policy.required_arguments === "object" &&
-  !Array.isArray(policy.required_arguments)
-) {
-  const requiredArguments =
-    policy.required_arguments[actualAction.tool];
+  // 1. Validate required arguments for the requested tool.
+  if (
+    policy.required_arguments &&
+    typeof policy.required_arguments === "object" &&
+    !Array.isArray(policy.required_arguments)
+  ) {
+    const requiredArguments =
+      policy.required_arguments[actualAction.tool];
 
-  if (Array.isArray(requiredArguments)) {
-    for (const argumentName of requiredArguments) {
-      if (
-        actualAction.arguments?.[argumentName] === undefined ||
-        actualAction.arguments?.[argumentName] === null
-      ) {
-        return {
-          status: "FAIL",
-          decision: "BLOCK",
-          reason: `Required argument '${argumentName}' is missing.`,
-          violation: "MISSING_REQUIRED_ARGUMENT",
-          exposure: 0
-        };
+    if (Array.isArray(requiredArguments)) {
+      for (const argumentName of requiredArguments) {
+        if (
+          actualAction.arguments?.[argumentName] === undefined ||
+          actualAction.arguments?.[argumentName] === null
+        ) {
+          return {
+            status: "FAIL",
+            decision: "BLOCK",
+            reason: `Required argument '${argumentName}' is missing.`,
+            violation: "MISSING_REQUIRED_ARGUMENT",
+            exposure: 0
+          };
+        }
       }
     }
   }
-}
 
+  // 2. Validate monetary amount when provided.
+  if (
+    amount !== undefined &&
+    (typeof amount !== "number" ||
+      !Number.isFinite(amount) ||
+      amount < 0)
+  ) {
+    return {
+      status: "FAIL",
+      decision: "BLOCK",
+      reason: "Transaction amount must be a non-negative number.",
+      violation: "INVALID_TRANSACTION_AMOUNT",
+      exposure: 0
+    };
+  }
 
-// 2. Validate monetary amount when provided.
-if (
-  amount !== undefined &&
-  (typeof amount !== "number" || !Number.isFinite(amount) || amount < 0)
-) {
-  return {
-    status: "FAIL",
-    decision: "BLOCK",
-    reason: "Transaction amount must be a non-negative number.",
-    violation: "INVALID_TRANSACTION_AMOUNT",
-    exposure: 0
-  };
-}
+  // 3. Validate supported currency.
+  const currency = actualAction.arguments?.currency;
 
-// 3. Validate supported currency.
-const currency = actualAction.arguments?.currency;
+  if (
+    currency !== undefined &&
+    Array.isArray(policy.supported_currencies) &&
+    !policy.supported_currencies.includes(currency)
+  ) {
+    return {
+      status: "FAIL",
+      decision: "BLOCK",
+      reason: "Transaction currency is not supported by the configured policy.",
+      violation: "UNSUPPORTED_CURRENCY",
+      exposure: 0
+    };
+  }
 
-if (
-  currency !== undefined &&
-  Array.isArray(policy.supported_currencies) &&
-  !policy.supported_currencies.includes(currency)
-) {
-  return {
-    status: "FAIL",
-    decision: "BLOCK",
-    reason: "Transaction currency is not supported by the configured policy.",
-    violation: "UNSUPPORTED_CURRENCY",
-    exposure: 0
-  };
-}
-
-  // 2. Absolute transaction limit.
-  // This limit applies regardless of user authorization.
+  // 4. Absolute transaction limit.
+  // This limit always results in BLOCK, regardless of authorization
+  // or whether human approval could otherwise be requested.
   if (
     typeof policy.max_transaction_amount === "number" &&
     amount !== undefined &&
@@ -94,7 +96,9 @@ if (
     };
   }
 
-  // 3. Authorization check.
+  // 5. Explicit user authorization.
+  // Preserve the existing semantics: if this policy requires
+  // authorization, missing authorization is a hard BLOCK.
   if (
     policy.requires_user_authorization === true &&
     actualAction.authorized !== true
@@ -108,8 +112,27 @@ if (
     };
   }
 
-  // 4. Autonomous monetary limit.
-  // This applies only when the action is not explicitly authorized.
+  // 6. Optional human approval boundary.
+  // This is explicitly opt-in through policy.approval_required_above.
+  // It never overrides the absolute limit above.
+  if (
+    actualAction.authorized !== true &&
+    typeof policy.approval_required_above === "number" &&
+    amount !== undefined &&
+    amount > policy.approval_required_above
+  ) {
+    return {
+      status: "PASS",
+      decision: "REQUIRE_APPROVAL",
+      reason: "Transaction exceeds the autonomous approval threshold and requires human approval.",
+      violation: "HUMAN_APPROVAL_REQUIRED",
+      exposure: amount
+    };
+  }
+
+  // 7. Autonomous monetary limit.
+  // Existing behavior is preserved for policies that do not opt into
+  // the explicit human approval boundary.
   if (
     actualAction.authorized !== true &&
     typeof policy.max_amount_without_confirmation === "number" &&
