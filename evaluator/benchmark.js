@@ -15,7 +15,7 @@ const scenariosDir = path.join(__dirname, "..", "scenarios");
  * - prevents blocked actions from reaching MCP
  * - produces the expected execution outcome
  */
-async function runBenchmark(scenarioFiles) {
+async function runBenchmark(scenarioFiles, options = {}) {
   if (!Array.isArray(scenarioFiles) || scenarioFiles.length === 0) {
     throw new Error("Benchmark requires at least one scenario.");
   }
@@ -46,25 +46,35 @@ async function runBenchmark(scenarioFiles) {
       );
     }
 
-    const actualAction = {
-      tool: scenario.agent.requested_action,
-      authorized: scenario.agent.authorized === true,
-      arguments: scenario.agent.arguments
-    };
+ let actualAction;
+
+if (options.agentGenerator) {
+  actualAction = await options.agentGenerator(scenario);
+} else {
+  actualAction = {
+    tool: scenario.agent.requested_action,
+    authorized: scenario.agent.authorized === true,
+    arguments: scenario.agent.arguments
+  };
+}
 
     let mcpFactoryCalls = 0;
 
-    const result = await executeProposedAction(
-      scenario,
-      actualAction,
-      async () => {
-        mcpFactoryCalls++;
+const result = await executeProposedAction(
+  scenario,
+  actualAction,
+  async () => {
+    mcpFactoryCalls++;
 
-        const { createMcpClient } = require("../agent/mcp-client");
+    if (options.mcpClientFactory) {
+      return await options.mcpClientFactory();
+    }
 
-        return await createMcpClient();
-      }
-    );
+    const { createMcpClient } = require("../agent/mcp-client");
+
+    return await createMcpClient();
+  }
+);
 
     const expected = scenario.expected;
 
@@ -96,6 +106,7 @@ async function runBenchmark(scenarioFiles) {
       scenarioId: scenario.id,
       scenarioName: scenario.name,
       risk: scenario.risk,
+      action: actualAction,
 
       expected: {
         decision: expected.decision,
@@ -272,7 +283,53 @@ function buildBenchmarkSummary(results) {
   };
 }
 
+async function runLocalAgentBenchmark(scenarioFiles) {
+  const { generateLocalAction } = require("../agent/local-agent");
+
+  const fakeMcpClientFactory = async () => {
+    return {
+      async callTool(request) {
+        return {
+          isError: false,
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                simulated: true,
+                tool: request.name,
+                arguments: request.arguments
+              })
+            }
+          ]
+        };
+      },
+
+      async close() {}
+    };
+  };
+
+  return runBenchmark(scenarioFiles, {
+    agentGenerator: async (scenario) => {
+      if (
+        typeof scenario.user_request !== "string" ||
+        scenario.user_request.trim() === ""
+      ) {
+        throw new Error(
+          `Scenario ${scenario.id} is missing user_request for local-agent benchmark.`
+        );
+      }
+
+      return generateLocalAction(
+        scenario.user_request
+      );
+    },
+
+    mcpClientFactory: fakeMcpClientFactory
+  });
+}
+
 module.exports = {
   runBenchmark,
+  runLocalAgentBenchmark,
   buildBenchmarkSummary
 };
