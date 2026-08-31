@@ -74,120 +74,133 @@ function validateScenario(scenario) {
       );
     }
 
+    // Optional autonomous spending limit
     if (
-      typeof scenario.policy.max_amount_without_confirmation !==
-        "number" ||
-      scenario.policy.max_amount_without_confirmation < 0
+      scenario.policy.max_amount_without_confirmation !== undefined &&
+      (
+        typeof scenario.policy.max_amount_without_confirmation !== "number" ||
+        !Number.isFinite(
+          scenario.policy.max_amount_without_confirmation
+        ) ||
+        scenario.policy.max_amount_without_confirmation < 0
+      )
     ) {
       errors.push(
-        "Policy 'max_amount_without_confirmation' must be a non-negative number."
+        "Policy 'max_amount_without_confirmation' must be a non-negative number when provided."
       );
     }
 
+    // Optional human approval threshold
     if (
-  scenario.policy.max_transaction_amount !== undefined &&
-  (
-    typeof scenario.policy.max_transaction_amount !== "number" ||
-    scenario.policy.max_transaction_amount < 0
-  )
-) {
-  errors.push(
-    "Policy 'max_transaction_amount' must be a non-negative number when provided."
-  );
-}
+      scenario.policy.approval_required_above !== undefined &&
+      (
+        typeof scenario.policy.approval_required_above !== "number" ||
+        !Number.isFinite(
+          scenario.policy.approval_required_above
+        ) ||
+        scenario.policy.approval_required_above < 0
+      )
+    ) {
+      errors.push(
+        "Policy 'approval_required_above' must be a non-negative number when provided."
+      );
+    }
 
-if (scenario.policy.allowed_tools !== undefined) {
-  if (
-    !Array.isArray(scenario.policy.allowed_tools) ||
-    scenario.policy.allowed_tools.length === 0 ||
-    scenario.policy.allowed_tools.some(
-      (tool) =>
-        typeof tool !== "string" ||
-        tool.trim() === ""
-    )
-  ) {
-    errors.push(
-      "Policy 'allowed_tools' must be a non-empty array of non-empty strings when provided."
-    );
-  }
-}
+    // Optional absolute transaction limit
+    if (
+      scenario.policy.max_transaction_amount !== undefined &&
+      (
+        typeof scenario.policy.max_transaction_amount !== "number" ||
+        !Number.isFinite(
+          scenario.policy.max_transaction_amount
+        ) ||
+        scenario.policy.max_transaction_amount < 0
+      )
+    ) {
+      errors.push(
+        "Policy 'max_transaction_amount' must be a non-negative number when provided."
+      );
+    }
 
-if (scenario.policy.required_arguments !== undefined) {
-  const requiredArguments = scenario.policy.required_arguments;
-
-  if (
-    typeof requiredArguments !== "object" ||
-    requiredArguments === null ||
-    Array.isArray(requiredArguments)
-  ) {
-    errors.push(
-      "Policy 'required_arguments' must be an object mapping tool names to argument arrays when provided."
-    );
-  } else {
-    for (const [tool, argumentsList] of Object.entries(
-      requiredArguments
-    )) {
+    // Optional allowed tool list
+    if (scenario.policy.allowed_tools !== undefined) {
       if (
-        typeof tool !== "string" ||
-        tool.trim() === ""
-      ) {
-        errors.push(
-          "Policy 'required_arguments' contains an invalid tool name."
-        );
-        continue;
-      }
-
-      if (
-        !Array.isArray(argumentsList) ||
-        argumentsList.length === 0 ||
-        argumentsList.some(
-          (argumentName) =>
-            typeof argumentName !== "string" ||
-            argumentName.trim() === ""
+        !Array.isArray(scenario.policy.allowed_tools) ||
+        scenario.policy.allowed_tools.length === 0 ||
+        scenario.policy.allowed_tools.some(
+          (tool) =>
+            typeof tool !== "string" ||
+            tool.trim() === ""
         )
       ) {
         errors.push(
-          `Policy 'required_arguments.${tool}' must be a non-empty array of non-empty strings.`
+          "Policy 'allowed_tools' must be a non-empty array of non-empty strings when provided."
         );
       }
     }
-  }
-}
 
-if (scenario.policy.supported_currencies !== undefined) {
-  if (
-    !Array.isArray(scenario.policy.supported_currencies) ||
-    scenario.policy.supported_currencies.length === 0 ||
-    scenario.policy.supported_currencies.some(
-      (currency) =>
-        typeof currency !== "string" ||
-        currency.trim() === ""
-    )
-  ) {
-    errors.push(
-      "Policy 'supported_currencies' must be a non-empty array of non-empty strings when provided."
-    );
-  }
-}
+    // Optional required arguments
+    if (scenario.policy.required_arguments !== undefined) {
+      const requiredArguments =
+        scenario.policy.required_arguments;
 
+      if (
+        typeof requiredArguments !== "object" ||
+        requiredArguments === null ||
+        Array.isArray(requiredArguments)
+      ) {
+        errors.push(
+          "Policy 'required_arguments' must be an object mapping tool names to argument arrays when provided."
+        );
+      } else {
+        for (const [tool, argumentsList] of Object.entries(
+          requiredArguments
+        )) {
+          if (
+            typeof tool !== "string" ||
+            tool.trim() === ""
+          ) {
+            errors.push(
+              "Policy 'required_arguments' contains an invalid tool name."
+            );
+            continue;
+          }
 
+          if (
+            !Array.isArray(argumentsList) ||
+            argumentsList.length === 0 ||
+            argumentsList.some(
+              (argumentName) =>
+                typeof argumentName !== "string" ||
+                argumentName.trim() === ""
+            )
+          ) {
+            errors.push(
+              `Policy 'required_arguments.${tool}' must be a non-empty array of non-empty strings.`
+            );
+          }
+        }
+      }
+    }
 
-if (scenario.policy.supported_currencies !== undefined) {
-  if (
-    !Array.isArray(scenario.policy.supported_currencies) ||
-    scenario.policy.supported_currencies.length === 0 ||
-    scenario.policy.supported_currencies.some(
-      (currency) =>
-        typeof currency !== "string" ||
-        currency.trim() === ""
-    )
-  ) {
-    errors.push(
-      "Policy 'supported_currencies' must be a non-empty array of non-empty strings when provided."
-    );
-  }
-}
-
+    // Optional supported currencies
+    if (scenario.policy.supported_currencies !== undefined) {
+      if (
+        !Array.isArray(
+          scenario.policy.supported_currencies
+        ) ||
+        scenario.policy.supported_currencies.length === 0 ||
+        scenario.policy.supported_currencies.some(
+          (currency) =>
+            typeof currency !== "string" ||
+            currency.trim() === ""
+        )
+      ) {
+        errors.push(
+          "Policy 'supported_currencies' must be a non-empty array of non-empty strings when provided."
+        );
+      }
+    }
   }
 
   // Expected result
@@ -199,7 +212,11 @@ if (scenario.policy.supported_currencies !== undefined) {
       "Scenario must contain an 'expected' object."
     );
   } else {
-    const allowedDecisions = ["ALLOW", "BLOCK"];
+    const allowedDecisions = [
+      "ALLOW",
+      "BLOCK",
+      "REQUIRE_APPROVAL"
+    ];
 
     if (
       !allowedDecisions.includes(
@@ -207,7 +224,7 @@ if (scenario.policy.supported_currencies !== undefined) {
       )
     ) {
       errors.push(
-        "Expected 'decision' must be either ALLOW or BLOCK."
+        "Expected 'decision' must be ALLOW, BLOCK, or REQUIRE_APPROVAL."
       );
     }
 

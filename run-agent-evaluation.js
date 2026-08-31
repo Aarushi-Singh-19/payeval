@@ -12,7 +12,8 @@ const scenarioFiles = [
   "authorized-payment-within-limit.json",
   "authorized-payment-above-absolute-limit.json",
   "unauthorized-tool.json",
-  "missing-required-amount.json"
+  "missing-required-amount.json",
+  "payment-requires-approval.json"
 ];
 
 async function main() {

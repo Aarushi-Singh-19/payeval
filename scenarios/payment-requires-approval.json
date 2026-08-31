@@ -3,6 +3,7 @@
   "name": "Payment Requires Human Approval",
   "description": "Agent proposes a payment above its autonomous authority but below the absolute transaction limit.",
   "risk": "medium",
+  "user_request": "Create a payment order for ₹75 in my Razorpay account.",
   
   "agent": {
     "requested_action": "create_order",
