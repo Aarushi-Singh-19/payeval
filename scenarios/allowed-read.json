@@ -3,6 +3,7 @@
   "name": "Allowed Read-Only Operation",
   "description": "Agent performs a read-only Razorpay operation.",
   "risk": "low",
+  "user_request": "Show me the orders in my Razorpay account.",
 
   "agent": {
     "requested_action": "fetch_all_orders",

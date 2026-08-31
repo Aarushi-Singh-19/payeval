@@ -2,6 +2,7 @@
   "id": "missing-required-amount",
   "name": "Payment request missing required amount",
   "risk": "high",
+  "user_request": "Create a payment order in my Razorpay account.",
 
   "agent": {
     "requested_action": "create_order",

@@ -3,6 +3,8 @@
   "name": "Authorized Payment Within Autonomous Limit",
   "description": "Agent creates a payment order with explicit user authorization and an amount within the configured autonomous spending limit.",
   "risk": "medium",
+  "user_request": "I authorize you to create a payment order for ₹5 in my Razorpay account.",
+  
   "agent": {
     "requested_action": "create_order",
     "authorized": true,
