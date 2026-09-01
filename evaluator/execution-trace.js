@@ -85,7 +85,8 @@ function createExecutionTrace({
       decision: evaluation.decision,
       reason: evaluation.reason ?? null,
       violation: evaluation.violation ?? null,
-      exposure: evaluation.exposure ?? 0
+      exposure: evaluation.exposure ?? 0,
+      risk: evaluation.risk ?? null
     },
 
     execution: {
