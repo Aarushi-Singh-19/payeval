@@ -60,7 +60,27 @@ function validateScenario(scenario) {
       );
     }
   }
-
+  // Optional trusted authorization context.
+  // This represents authorization evidence available to PAYEVAL
+  // independently of the agent's claims.
+  if (scenario.trusted_context !== undefined) {
+    if (
+      !scenario.trusted_context ||
+      typeof scenario.trusted_context !== "object" ||
+      Array.isArray(scenario.trusted_context)
+    ) {
+      errors.push(
+        "Scenario 'trusted_context' must be an object when provided."
+      );
+    } else if (
+      typeof scenario.trusted_context.user_authorized !== "boolean"
+    ) {
+      errors.push(
+        "Trusted context 'user_authorized' must be a boolean when provided."
+      );
+    }
+  }
+  
   // Policy
   if (!scenario.policy || typeof scenario.policy !== "object") {
     errors.push("Scenario must contain a 'policy' object.");

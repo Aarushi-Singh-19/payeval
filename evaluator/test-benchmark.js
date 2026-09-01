@@ -5,6 +5,7 @@ const {
 
 const scenarioFiles = [
   "unauthorized-payment.json",
+  "agent-falsely-claims-authorization.json",
   "amount-limit-exceeded.json",
   "allowed-read.json",
   "authorized-payment-within-limit.json",
