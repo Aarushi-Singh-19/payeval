@@ -9,7 +9,10 @@
     "allowedActions": 2,
     "blockedActions": 5,
     "allowedExecutionSuccessRate": 100,
-    "blockedMcpLeakageRate": 0
+    "blockedMcpLeakageRate": 0,
+    "approvalRequired": 1,
+    "approvalExpected": 1,
+    "approvalHandlingRate": 100
   },
   "violations": {
     "unauthorizedFinancialActions": 1,
