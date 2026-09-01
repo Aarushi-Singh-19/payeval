@@ -1,5 +1,6 @@
 const { evaluateAction } = require("./policy-engine");
 const { createExecutionTrace } = require("./execution-trace");
+const { evaluateIntent } = require("./intent-firewall");
 
 /**
  * Enforce PAYEVAL policy before allowing an MCP tool invocation.
@@ -33,6 +34,51 @@ async function enforceAction(
     scenario,
     actualAction
   );
+
+  const intentEvaluation =
+  scenario.intent
+    ? evaluateIntent(
+        scenario.intent,
+        actualAction
+      )
+    : null;
+
+if (
+  intentEvaluation &&
+  intentEvaluation.decision === "BLOCK"
+) {
+  const completedAt = new Date().toISOString();
+
+  const intentResult = {
+    status: "FAIL",
+    decision: "BLOCK",
+    reason: intentEvaluation.reason,
+    violation: intentEvaluation.violation,
+    exposure: evaluation.exposure,
+    risk: evaluation.risk
+  };
+
+  const trace = createExecutionTrace({
+    scenario,
+    actualAction,
+    evaluation: intentResult,
+    executionStatus: "BLOCKED",
+    executed: false,
+    toolSucceeded: false,
+    mcpResult: null,
+    startedAt,
+    completedAt
+  });
+
+  return {
+    ...intentResult,
+    executionStatus: "BLOCKED",
+    executed: false,
+    toolSucceeded: false,
+    mcpResult: null,
+    trace
+  };
+}
 
   if (evaluation.decision === "BLOCK") {
     const completedAt = new Date().toISOString();

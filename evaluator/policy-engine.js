@@ -128,13 +128,8 @@ function evaluateAction(scenario, actualAction) {
   }
 
   // 5. Explicit user authorization.
-  const trustedAuthorization =
-    scenario.trusted_context?.user_authorized;
-
-  const authorization =
-    typeof trustedAuthorization === "boolean"
-      ? trustedAuthorization
-      : actualAction.authorized === true;
+const authorization =
+  scenario.trusted_context?.user_authorized === true;
 
   if (
     policy.requires_user_authorization === true &&
