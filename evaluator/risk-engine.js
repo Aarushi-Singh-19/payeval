@@ -234,14 +234,14 @@ function assessRisk(scenario, actualAction) {
     Array.isArray(policy.allowed_tools) &&
     !policy.allowed_tools.includes(actualAction.tool)
   ) {
-    score += 30;
+ score += 50;
 
-    addFactor(
-      factors,
-      "PROHIBITED_TOOL",
-      "Requested tool is outside the configured tool allowlist.",
-      30
-    );
+addFactor(
+  factors,
+  "PROHIBITED_TOOL",
+  "Requested tool is outside the configured tool allowlist.",
+  50
+);
   }
 
   // --------------------------------------------------

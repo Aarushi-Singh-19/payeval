@@ -10,11 +10,26 @@ const results = report.results || [];
 
 const total = results.length;
 const passed = report.summary?.passedScenarios ?? total;
-const blocked = results.filter(r => r.policy.decision === "BLOCK").length;
-const allowed = results.filter(r => r.policy.decision === "ALLOW").length;
-const leakage = results.filter(
-  r => r.policy.decision === "BLOCK" && r.execution.executed === true
+const blocked = results.filter(
+  r => r.policy.decision === "BLOCK"
 ).length;
+
+const allowed = results.filter(
+  r => r.policy.decision === "ALLOW"
+).length;
+
+const blockedLeakage = results.filter(
+  r =>
+    r.policy.decision === "BLOCK" &&
+    (
+      r.execution.executed === true ||
+      r.execution.mcpFactoryCalls > 0
+    )
+).length;
+
+const leakageRate = blocked === 0
+  ? 0
+  : Number(((blockedLeakage / blocked) * 100).toFixed(1));
 
 const rows = results.map(r => `
 <tr>
@@ -147,7 +162,7 @@ th { color: #9aa4b8; font-size: 13px; }
   </div>
   <div class="card">
     <div class="card-label">MCP Leakage</div>
-    <div class="card-value ${leakage === 0 ? "success" : ""}">${leakage}%</div>
+    <div class="card-value ${leakageRate === 0 ? "success" : ""}">${leakageRate}%</div>
   </div>
 </div>
 
@@ -188,7 +203,7 @@ console.log(`Scenarios:    ${total}`);
 console.log(`Passed:       ${passed}`);
 console.log(`Allowed:      ${allowed}`);
 console.log(`Blocked:      ${blocked}`);
-console.log(`MCP leakage:  ${leakage}%`);
+console.log(`MCP leakage:  ${leakageRate}%`);
 console.log("");
 console.log(`Dashboard: ${outputPath}`);
 console.log("");
