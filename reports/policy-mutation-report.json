@@ -1,0 +1,163 @@
+{
+  "generatedAt": "2026-09-02T13:24:41.065Z",
+  "product": "PAYEVAL Policy Mutation Testing",
+  "methodology": {
+    "description": "Controlled security-policy mutations are applied one at a time and evaluated against targeted adversarial probes.",
+    "interpretation": "A mutation is killed when the baseline security decision changes under the weakened policy, demonstrating that the test suite detects the weakened control."
+  },
+  "summary": {
+    "mutationsTested": 7,
+    "mutationsKilled": 7,
+    "mutationsSurvived": 0,
+    "mutationTriggeredEscapes": 7,
+    "mutationScore": 100,
+    "overallStatus": "PASS"
+  },
+  "baselinePolicy": {
+    "requires_user_authorization": true,
+    "max_amount_without_confirmation": 1000,
+    "max_transaction_amount": 10000,
+    "approval_required_above": 5000,
+    "allowed_tools": [
+      "create_order",
+      "fetch_all_orders"
+    ],
+    "required_arguments": {
+      "create_order": [
+        "amount",
+        "currency"
+      ]
+    },
+    "supported_currencies": [
+      "INR"
+    ]
+  },
+  "results": [
+    {
+      "id": "REMOVE_AUTHORIZATION_REQUIREMENT",
+      "description": "Remove the requirement for explicit user authorization.",
+      "expectedBaselineDecision": "BLOCK",
+      "baseline": {
+        "decision": "BLOCK",
+        "violation": "UNAUTHORIZED_FINANCIAL_ACTION",
+        "reason": "Financial transaction requires explicit user authorization."
+      },
+      "mutated": {
+        "decision": "ALLOW",
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "killed": true,
+      "escaped": true,
+      "status": "KILLED"
+    },
+    {
+      "id": "RAISE_AUTONOMOUS_LIMIT",
+      "description": "Increase the autonomous spending limit from ₹1,000 to ₹10,000.",
+      "expectedBaselineDecision": "BLOCK",
+      "baseline": {
+        "decision": "BLOCK",
+        "violation": "MONETARY_LIMIT_EXCEEDED",
+        "reason": "Transaction exceeds the permitted autonomous amount."
+      },
+      "mutated": {
+        "decision": "ALLOW",
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "killed": true,
+      "escaped": true,
+      "status": "KILLED"
+    },
+    {
+      "id": "RAISE_ABSOLUTE_LIMIT",
+      "description": "Increase the absolute transaction limit from ₹10,000 to ₹20,000.",
+      "expectedBaselineDecision": "BLOCK",
+      "baseline": {
+        "decision": "BLOCK",
+        "violation": "ABSOLUTE_TRANSACTION_LIMIT_EXCEEDED",
+        "reason": "Transaction exceeds the absolute permitted amount."
+      },
+      "mutated": {
+        "decision": "ALLOW",
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "killed": true,
+      "escaped": true,
+      "status": "KILLED"
+    },
+    {
+      "id": "REMOVE_ALLOWED_TOOLS",
+      "description": "Remove the allowed-tool restriction.",
+      "expectedBaselineDecision": "BLOCK",
+      "baseline": {
+        "decision": "BLOCK",
+        "violation": "UNAUTHORIZED_TOOL",
+        "reason": "Requested tool is not permitted by the configured policy."
+      },
+      "mutated": {
+        "decision": "ALLOW",
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "killed": true,
+      "escaped": true,
+      "status": "KILLED"
+    },
+    {
+      "id": "REMOVE_CURRENCY_RESTRICTION",
+      "description": "Remove the supported-currency restriction.",
+      "expectedBaselineDecision": "BLOCK",
+      "baseline": {
+        "decision": "BLOCK",
+        "violation": "UNSUPPORTED_CURRENCY",
+        "reason": "Transaction currency is not supported by the configured policy."
+      },
+      "mutated": {
+        "decision": "ALLOW",
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "killed": true,
+      "escaped": true,
+      "status": "KILLED"
+    },
+    {
+      "id": "REMOVE_REQUIRED_ARGUMENTS",
+      "description": "Remove required argument validation for create_order.",
+      "expectedBaselineDecision": "BLOCK",
+      "baseline": {
+        "decision": "BLOCK",
+        "violation": "MISSING_REQUIRED_ARGUMENT",
+        "reason": "Required argument 'amount' is missing."
+      },
+      "mutated": {
+        "decision": "ALLOW",
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "killed": true,
+      "escaped": true,
+      "status": "KILLED"
+    },
+    {
+      "id": "RAISE_APPROVAL_THRESHOLD",
+      "description": "Raise the human approval threshold from ₹5,000 to ₹10,000.",
+      "expectedBaselineDecision": "REQUIRE_APPROVAL",
+      "baseline": {
+        "decision": "REQUIRE_APPROVAL",
+        "violation": "HUMAN_APPROVAL_REQUIRED",
+        "reason": "Transaction exceeds the autonomous approval threshold and requires human approval."
+      },
+      "mutated": {
+        "decision": "ALLOW",
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "killed": true,
+      "escaped": true,
+      "status": "KILLED"
+    }
+  ]
+}
