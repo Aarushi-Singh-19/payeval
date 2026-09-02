@@ -6,6 +6,15 @@ const {
   verifyTransactionPassport
 } = require("./transaction-passport");
 
+const {
+  createActionLineage,
+  attachPassport,
+  recordDecision,
+  recordExecution,
+  recordSecurityEvent,
+  summarizeLineage
+} = require("./action-lineage");
+
 /**
  * Enforce PAYEVAL security policy before allowing an MCP tool invocation.
  *
@@ -33,6 +42,24 @@ async function enforceAction(
   transactionPassport = null
 ) {
   const startedAt = new Date().toISOString();
+
+  const lineageIntent =
+    scenario.intent || {
+      tool: actualAction.tool,
+      amount: actualAction.arguments?.amount ?? null,
+      currency: actualAction.arguments?.currency ?? null,
+      target: actualAction.arguments?.receipt ?? null
+    };
+
+  const lineage = createActionLineage({
+    intent: lineageIntent,
+    policy: scenario.policy,
+    action: actualAction
+  });
+
+  recordSecurityEvent(lineage, "ENFORCEMENT_STARTED", {
+    tool: actualAction.tool
+  });
 
   const evaluation = evaluateAction(
     scenario,
@@ -68,6 +95,12 @@ async function enforceAction(
       risk: evaluation.risk
     };
 
+    recordDecision(lineage, {
+      decision: "BLOCK",
+      violation: intentEvaluation.violation,
+      reason: intentEvaluation.reason
+    });
+
     const trace = createExecutionTrace({
       scenario,
       actualAction,
@@ -87,6 +120,8 @@ async function enforceAction(
       toolSucceeded: false,
       mcpResult: null,
       transactionPassport: null,
+      lineage,
+      lineageSummary: summarizeLineage(lineage),
       trace
     };
   }
@@ -99,6 +134,12 @@ async function enforceAction(
 
   if (evaluation.decision === "BLOCK") {
     const completedAt = new Date().toISOString();
+
+    recordDecision(lineage, {
+      decision: "BLOCK",
+      violation: evaluation.violation,
+      reason: evaluation.reason
+    });
 
     const trace = createExecutionTrace({
       scenario,
@@ -119,6 +160,8 @@ async function enforceAction(
       toolSucceeded: false,
       mcpResult: null,
       transactionPassport: null,
+      lineage,
+      lineageSummary: summarizeLineage(lineage),
       trace
     };
   }
@@ -152,6 +195,8 @@ async function enforceAction(
         toolSucceeded: false,
         mcpResult: null,
         transactionPassport: null,
+        lineage,
+        lineageSummary: summarizeLineage(lineage),
         trace
       };
     }
@@ -184,6 +229,8 @@ async function enforceAction(
         toolSucceeded: false,
         mcpResult: null,
         transactionPassport: null,
+        lineage,
+        lineageSummary: summarizeLineage(lineage),
         trace
       };
     }
@@ -225,6 +272,20 @@ async function enforceAction(
       policy: scenario.policy,
       action: actualAction
     });
+
+    attachPassport(lineage, activePassport);
+
+    recordSecurityEvent(lineage, "TRANSACTION_PASSPORT_ISSUED", {
+      passportId: activePassport.passportId,
+      expiresAt: activePassport.expiresAt
+    });
+  }
+
+  if (transactionPassport) {
+    attachPassport(lineage, activePassport);
+    recordSecurityEvent(lineage, "TRANSACTION_PASSPORT_PRESENTED", {
+      passportId: activePassport.passportId
+    });
   }
 
   const passportIntent =
@@ -247,6 +308,12 @@ const passportVerification =
   );
 
   if (!passportVerification.valid) {
+    recordSecurityEvent(lineage, "TRANSACTION_PASSPORT_REJECTED", {
+      passportId: activePassport.passportId,
+      violation: passportVerification.violation,
+      reason: passportVerification.reason
+    });
+
     const completedAt = new Date().toISOString();
 
     const passportResult = {
@@ -277,9 +344,22 @@ const passportVerification =
       toolSucceeded: false,
       mcpResult: null,
       transactionPassport: activePassport,
+      lineage,
+      lineageSummary: summarizeLineage(lineage),
       trace
     };
   }
+
+  recordSecurityEvent(lineage, "TRANSACTION_PASSPORT_VERIFIED", {
+    passportId: activePassport.passportId
+  });
+
+  recordDecision(lineage, {
+    decision: "ALLOW",
+    violation: null,
+    reason: evaluation.reason || "Action authorized by policy."
+  });
+
 
   /*
    * ------------------------------------------------------------
@@ -295,8 +375,18 @@ const passportVerification =
     } else {
       mcpClient = mcpClientOrFactory;
     }
+
+    recordSecurityEvent(lineage, "MCP_CONNECTION_ESTABLISHED");
   } catch (error) {
     const completedAt = new Date().toISOString();
+
+    recordExecution(lineage, {
+      attempted: false,
+      executed: false,
+      externalCalls: 0,
+      toolSucceeded: false,
+      status: "MCP_CONNECTION_FAILURE"
+    });
 
     const trace = createExecutionTrace({
       scenario,
@@ -318,6 +408,8 @@ const passportVerification =
       toolSucceeded: false,
       mcpResult: null,
       transactionPassport: activePassport,
+      lineage,
+      lineageSummary: summarizeLineage(lineage),
       trace
     };
   }
@@ -350,6 +442,19 @@ const passportVerification =
       ? "EXECUTED_SUCCESS"
       : "EXECUTED_FAILURE";
 
+  recordExecution(lineage, {
+    attempted: true,
+    executed: true,
+    externalCalls: 1,
+    toolSucceeded,
+    status: executionStatus,
+    externalReference:
+      mcpResult?.orderId || mcpResult?.order?.id ||
+      mcpResult?.id ||
+      mcpResult?.order_id ||
+      null
+  });
+
   const completedAt = new Date().toISOString();
 
   const trace = createExecutionTrace({
@@ -371,6 +476,8 @@ const passportVerification =
     toolSucceeded,
     mcpResult,
     transactionPassport: activePassport,
+    lineage,
+    lineageSummary: summarizeLineage(lineage),
     trace
   };
 }
