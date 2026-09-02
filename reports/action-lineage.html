@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAYEVAL Transaction Security Timeline</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #090d18;
+  color: #edf2ff;
+}
+
+.container {
+  max-width: 1180px;
+  margin: auto;
+  padding: 48px 24px 64px;
+}
+
+.hero {
+  background: linear-gradient(135deg, #151c31, #101626);
+  border: 1px solid #293552;
+  border-radius: 22px;
+  padding: 36px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  color: #8d9ab5;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 42px;
+  margin: 10px 0;
+}
+
+.hero p {
+  color: #aab4c9;
+  font-size: 17px;
+  max-width: 760px;
+  line-height: 1.6;
+}
+
+.timeline-card {
+  background: #111827;
+  border: 1px solid #293552;
+  border-radius: 20px;
+  padding: 28px;
+  margin-top: 24px;
+}
+
+.timeline-card.blocked {
+  border-color: #63303b;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+h2 {
+  margin: 8px 0 0;
+  font-size: 25px;
+}
+
+.decision {
+  padding: 9px 15px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.decision-allow {
+  background: #153d2d;
+  color: #62e6a6;
+}
+
+.decision-block {
+  background: #431f29;
+  color: #ff8292;
+}
+
+.chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+  margin: 28px 0;
+  padding: 16px;
+  background: #0b1020;
+  border-radius: 12px;
+  color: #aeb9cf;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.events {
+  position: relative;
+  margin: 20px 0 28px;
+}
+
+.event {
+  display: flex;
+  gap: 16px;
+  padding: 17px 0;
+  border-bottom: 1px solid #222c42;
+}
+
+.event:last-child {
+  border-bottom: 0;
+}
+
+.event-index {
+  min-width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #26324c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.event.danger .event-index {
+  background: #572833;
+  color: #ff9aaa;
+}
+
+.event-type {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.event-time {
+  color: #707d96;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.event-detail {
+  color: #9ca9c0;
+  font-size: 12px;
+  margin-top: 7px;
+  word-break: break-word;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.facts div {
+  background: #0b1020;
+  border: 1px solid #202b43;
+  border-radius: 12px;
+  padding: 14px;
+  min-width: 0;
+}
+
+.facts span {
+  display: block;
+  color: #77839b;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.facts strong {
+  display: block;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.footer {
+  margin-top: 28px;
+  color: #66728a;
+  font-size: 12px;
+}
+
+@media(max-width:850px) {
+  .facts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+}
+
+@media(max-width:550px) {
+  .facts {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="eyebrow">PAYEVAL Security Control Plane</div>
+  <h1>Transaction Security Timeline</h1>
+  <p>
+    Every financial action is traceable from user intent to policy,
+    transaction authorization, exact action, external execution, and final result.
+  </p>
+</div>
+
+
+    <section class="timeline-card allowed">
+      <div class="timeline-header">
+        <div>
+          <div class="eyebrow">AUTHORIZED TRANSACTION</div>
+          <h2>₹500 Authorized Payment</h2>
+        </div>
+        <div class="decision decision-allow">
+          ALLOW
+        </div>
+      </div>
+
+      <div class="chain">
+        <span>USER INTENT</span>
+        <span>→</span>
+        <span>POLICY</span>
+        <span>→</span>
+        <span>PASSPORT</span>
+        <span>→</span>
+        <span>EXACT ACTION</span>
+        <span>→</span>
+        <span>EXECUTION</span>
+        <span>→</span>
+        <span>RESULT</span>
+      </div>
+
+      <div class="events">
+        
+      <div class="event ">
+        <div class="event-index">1</div>
+        <div>
+          <div class="event-type">ENFORCEMENT_STARTED</div>
+          <div class="event-time">2026-09-02T14:24:21.067Z</div>
+          <div class="event-detail">tool: create_order</div>
+        </div>
+      </div>
+    
+      <div class="event ">
+        <div class="event-index">2</div>
+        <div>
+          <div class="event-type">POLICY_DECISION</div>
+          <div class="event-time">2026-09-02T14:24:21.067Z</div>
+          <div class="event-detail">decision: ALLOW • violation: null • reason: Action complies with the configured policy.</div>
+        </div>
+      </div>
+    
+      <div class="event ">
+        <div class="event-index">3</div>
+        <div>
+          <div class="event-type">TRANSACTION_PASSPORT_PRESENTED</div>
+          <div class="event-time">2026-09-02T14:24:21.067Z</div>
+          <div class="event-detail">passportId: pp_cb6304eb1d450adea4859cfe</div>
+        </div>
+      </div>
+    
+      <div class="event ">
+        <div class="event-index">4</div>
+        <div>
+          <div class="event-type">TRANSACTION_PASSPORT_VERIFIED</div>
+          <div class="event-time">2026-09-02T14:24:21.067Z</div>
+          <div class="event-detail">passportId: pp_cb6304eb1d450adea4859cfe</div>
+        </div>
+      </div>
+    
+      <div class="event ">
+        <div class="event-index">5</div>
+        <div>
+          <div class="event-type">MCP_CONNECTION_ESTABLISHED</div>
+          <div class="event-time">2026-09-02T14:24:21.067Z</div>
+          
+        </div>
+      </div>
+    
+      <div class="event ">
+        <div class="event-index">6</div>
+        <div>
+          <div class="event-type">EXECUTION_RESULT</div>
+          <div class="event-time">2026-09-02T14:24:21.067Z</div>
+          <div class="event-detail">executed: true • externalCalls: 1 • toolSucceeded: true • status: EXECUTED_SUCCESS • externalReference: order_lineage_demo</div>
+        </div>
+      </div>
+    
+      </div>
+
+      <div class="facts">
+        <div>
+          <span>Lineage ID</span>
+          <strong>lin_23374e3d36e72a4e036cc56d</strong>
+        </div>
+        <div>
+          <span>Passport</span>
+          <strong>pp_cb6304eb1d450adea4859cfe</strong>
+        </div>
+        <div>
+          <span>Intent Hash</span>
+          <strong>bfa99f1824d6664dabf3bd5041f9db9b4990547fcbe5814aff5fb9997ade7fd3</strong>
+        </div>
+        <div>
+          <span>Action Hash</span>
+          <strong>f721370687308d6d390362f3fabf113af4f933a87746f8f34c045bb60bd7f746</strong>
+        </div>
+        <div>
+          <span>External Calls</span>
+          <strong>1</strong>
+        </div>
+        <div>
+          <span>External Reference</span>
+          <strong>order_lineage_demo</strong>
+        </div>
+        <div>
+          <span>Violation</span>
+          <strong>None</strong>
+        </div>
+        <div>
+          <span>Execution</span>
+          <strong>EXECUTED_SUCCESS</strong>
+        </div>
+      </div>
+    </section>
+  
+
+    <section class="timeline-card blocked">
+      <div class="timeline-header">
+        <div>
+          <div class="eyebrow">SECURITY EVENT</div>
+          <h2>₹500 → ₹5,000 Tampering Attempt</h2>
+        </div>
+        <div class="decision decision-block">
+          BLOCK
+        </div>
+      </div>
+
+      <div class="chain">
+        <span>USER INTENT</span>
+        <span>→</span>
+        <span>POLICY</span>
+        <span>→</span>
+        <span>PASSPORT</span>
+        <span>→</span>
+        <span>EXACT ACTION</span>
+        <span>→</span>
+        <span>EXECUTION</span>
+        <span>→</span>
+        <span>RESULT</span>
+      </div>
+
+      <div class="events">
+        
+      <div class="event danger">
+        <div class="event-index">1</div>
+        <div>
+          <div class="event-type">ENFORCEMENT_STARTED</div>
+          <div class="event-time">2026-09-02T14:24:21.068Z</div>
+          <div class="event-detail">tool: create_order</div>
+        </div>
+      </div>
+    
+      <div class="event danger">
+        <div class="event-index">2</div>
+        <div>
+          <div class="event-type">POLICY_DECISION</div>
+          <div class="event-time">2026-09-02T14:24:21.068Z</div>
+          <div class="event-detail">decision: BLOCK • violation: INTENT_AMOUNT_EXCEEDED • reason: Agent proposed an amount greater than the user&#039;s intended amount.</div>
+        </div>
+      </div>
+    
+      </div>
+
+      <div class="facts">
+        <div>
+          <span>Lineage ID</span>
+          <strong>lin_33f63fbb4c9a6c79fbcbed2f</strong>
+        </div>
+        <div>
+          <span>Passport</span>
+          <strong>None</strong>
+        </div>
+        <div>
+          <span>Intent Hash</span>
+          <strong>bfa99f1824d6664dabf3bd5041f9db9b4990547fcbe5814aff5fb9997ade7fd3</strong>
+        </div>
+        <div>
+          <span>Action Hash</span>
+          <strong>645aefe9669b607a7a7050281e5fbd35b791905e31141e61c9863ecb1405585b</strong>
+        </div>
+        <div>
+          <span>External Calls</span>
+          <strong>0</strong>
+        </div>
+        <div>
+          <span>External Reference</span>
+          <strong>None</strong>
+        </div>
+        <div>
+          <span>Violation</span>
+          <strong>INTENT_AMOUNT_EXCEEDED</strong>
+        </div>
+        <div>
+          <span>Execution</span>
+          <strong>NOT_ATTEMPTED</strong>
+        </div>
+      </div>
+    </section>
+  
+
+<div class="footer">
+  Generated by PAYEVAL • Lineage report version 1.0
+</div>
+
+</div>
+</body>
+</html>

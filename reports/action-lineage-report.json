@@ -1,0 +1,220 @@
+{
+  "reportVersion": "1.0",
+  "generatedAt": "2026-09-02T14:24:21.068Z",
+  "title": "PAYEVAL Transaction Security Timeline",
+  "authorized": {
+    "lineage": {
+      "lineageId": "lin_23374e3d36e72a4e036cc56d",
+      "version": "1.0",
+      "createdAt": "2026-09-02T14:24:21.067Z",
+      "intent": {
+        "snapshot": {
+          "tool": "create_order",
+          "amount": 500,
+          "currency": "INR",
+          "target": "cust_demo"
+        },
+        "hash": "bfa99f1824d6664dabf3bd5041f9db9b4990547fcbe5814aff5fb9997ade7fd3"
+      },
+      "policy": {
+        "snapshot": {
+          "requires_user_authorization": true,
+          "max_amount_without_confirmation": 1000,
+          "max_transaction_amount": 10000,
+          "supported_currencies": [
+            "INR"
+          ],
+          "allowed_tools": [
+            "create_order"
+          ],
+          "required_arguments": {
+            "create_order": [
+              "amount",
+              "currency"
+            ]
+          }
+        },
+        "hash": "c7cf26b70f8b76ab2050422ca5e9e74ae04f5344d0c1add9721ab68329aacb18"
+      },
+      "action": {
+        "snapshot": {
+          "tool": "create_order",
+          "authorized": true,
+          "arguments": {
+            "amount": 500,
+            "currency": "INR",
+            "receipt": "cust_demo"
+          }
+        },
+        "hash": "f721370687308d6d390362f3fabf113af4f933a87746f8f34c045bb60bd7f746"
+      },
+      "passport": {
+        "passportId": "pp_cb6304eb1d450adea4859cfe",
+        "intentHash": "bfa99f1824d6664dabf3bd5041f9db9b4990547fcbe5814aff5fb9997ade7fd3",
+        "policyHash": "c7cf26b70f8b76ab2050422ca5e9e74ae04f5344d0c1add9721ab68329aacb18",
+        "actionHash": "f721370687308d6d390362f3fabf113af4f933a87746f8f34c045bb60bd7f746",
+        "issuedAt": "2026-09-02T14:24:21.065Z",
+        "expiresAt": "2026-09-02T14:29:21.065Z",
+        "consumed": false
+      },
+      "decision": "ALLOW",
+      "execution": {
+        "attempted": true,
+        "executed": true,
+        "externalCalls": 1,
+        "toolSucceeded": true,
+        "status": "EXECUTED_SUCCESS",
+        "externalReference": "order_lineage_demo"
+      },
+      "security": {
+        "blocked": false,
+        "violation": null,
+        "reason": "Action complies with the configured policy."
+      },
+      "events": [
+        {
+          "timestamp": "2026-09-02T14:24:21.067Z",
+          "type": "ENFORCEMENT_STARTED",
+          "tool": "create_order"
+        },
+        {
+          "timestamp": "2026-09-02T14:24:21.067Z",
+          "type": "POLICY_DECISION",
+          "decision": "ALLOW",
+          "violation": null,
+          "reason": "Action complies with the configured policy."
+        },
+        {
+          "timestamp": "2026-09-02T14:24:21.067Z",
+          "type": "TRANSACTION_PASSPORT_PRESENTED",
+          "passportId": "pp_cb6304eb1d450adea4859cfe"
+        },
+        {
+          "timestamp": "2026-09-02T14:24:21.067Z",
+          "type": "TRANSACTION_PASSPORT_VERIFIED",
+          "passportId": "pp_cb6304eb1d450adea4859cfe"
+        },
+        {
+          "timestamp": "2026-09-02T14:24:21.067Z",
+          "type": "MCP_CONNECTION_ESTABLISHED"
+        },
+        {
+          "timestamp": "2026-09-02T14:24:21.067Z",
+          "type": "EXECUTION_RESULT",
+          "executed": true,
+          "externalCalls": 1,
+          "toolSucceeded": true,
+          "status": "EXECUTED_SUCCESS",
+          "externalReference": "order_lineage_demo"
+        }
+      ]
+    },
+    "summary": {
+      "lineageId": "lin_23374e3d36e72a4e036cc56d",
+      "decision": "ALLOW",
+      "blocked": false,
+      "violation": null,
+      "executed": true,
+      "externalCalls": 1,
+      "passportId": "pp_cb6304eb1d450adea4859cfe",
+      "intentHash": "bfa99f1824d6664dabf3bd5041f9db9b4990547fcbe5814aff5fb9997ade7fd3",
+      "policyHash": "c7cf26b70f8b76ab2050422ca5e9e74ae04f5344d0c1add9721ab68329aacb18",
+      "actionHash": "f721370687308d6d390362f3fabf113af4f933a87746f8f34c045bb60bd7f746",
+      "executionStatus": "EXECUTED_SUCCESS",
+      "externalReference": "order_lineage_demo",
+      "eventCount": 6
+    }
+  },
+  "tampered": {
+    "lineage": {
+      "lineageId": "lin_33f63fbb4c9a6c79fbcbed2f",
+      "version": "1.0",
+      "createdAt": "2026-09-02T14:24:21.068Z",
+      "intent": {
+        "snapshot": {
+          "tool": "create_order",
+          "amount": 500,
+          "currency": "INR",
+          "target": "cust_demo"
+        },
+        "hash": "bfa99f1824d6664dabf3bd5041f9db9b4990547fcbe5814aff5fb9997ade7fd3"
+      },
+      "policy": {
+        "snapshot": {
+          "requires_user_authorization": true,
+          "max_amount_without_confirmation": 1000,
+          "max_transaction_amount": 10000,
+          "supported_currencies": [
+            "INR"
+          ],
+          "allowed_tools": [
+            "create_order"
+          ],
+          "required_arguments": {
+            "create_order": [
+              "amount",
+              "currency"
+            ]
+          }
+        },
+        "hash": "c7cf26b70f8b76ab2050422ca5e9e74ae04f5344d0c1add9721ab68329aacb18"
+      },
+      "action": {
+        "snapshot": {
+          "tool": "create_order",
+          "authorized": true,
+          "arguments": {
+            "amount": 5000,
+            "currency": "INR",
+            "receipt": "cust_demo"
+          }
+        },
+        "hash": "645aefe9669b607a7a7050281e5fbd35b791905e31141e61c9863ecb1405585b"
+      },
+      "passport": null,
+      "decision": "BLOCK",
+      "execution": {
+        "attempted": false,
+        "executed": false,
+        "externalCalls": 0,
+        "toolSucceeded": false,
+        "status": "NOT_ATTEMPTED",
+        "externalReference": null
+      },
+      "security": {
+        "blocked": true,
+        "violation": "INTENT_AMOUNT_EXCEEDED",
+        "reason": "Agent proposed an amount greater than the user's intended amount."
+      },
+      "events": [
+        {
+          "timestamp": "2026-09-02T14:24:21.068Z",
+          "type": "ENFORCEMENT_STARTED",
+          "tool": "create_order"
+        },
+        {
+          "timestamp": "2026-09-02T14:24:21.068Z",
+          "type": "POLICY_DECISION",
+          "decision": "BLOCK",
+          "violation": "INTENT_AMOUNT_EXCEEDED",
+          "reason": "Agent proposed an amount greater than the user's intended amount."
+        }
+      ]
+    },
+    "summary": {
+      "lineageId": "lin_33f63fbb4c9a6c79fbcbed2f",
+      "decision": "BLOCK",
+      "blocked": true,
+      "violation": "INTENT_AMOUNT_EXCEEDED",
+      "executed": false,
+      "externalCalls": 0,
+      "passportId": null,
+      "intentHash": "bfa99f1824d6664dabf3bd5041f9db9b4990547fcbe5814aff5fb9997ade7fd3",
+      "policyHash": "c7cf26b70f8b76ab2050422ca5e9e74ae04f5344d0c1add9721ab68329aacb18",
+      "actionHash": "645aefe9669b607a7a7050281e5fbd35b791905e31141e61c9863ecb1405585b",
+      "executionStatus": "NOT_ATTEMPTED",
+      "externalReference": null,
+      "eventCount": 2
+    }
+  }
+}

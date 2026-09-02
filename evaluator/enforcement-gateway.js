@@ -256,6 +256,12 @@ async function enforceAction(
    * against the CURRENT final action instead.
    */
 
+  recordDecision(lineage, {
+    decision: "ALLOW",
+    violation: null,
+    reason: evaluation.reason || "Action authorized by policy."
+  });
+
   let activePassport = transactionPassport;
 
   if (!activePassport) {
@@ -352,12 +358,6 @@ const passportVerification =
 
   recordSecurityEvent(lineage, "TRANSACTION_PASSPORT_VERIFIED", {
     passportId: activePassport.passportId
-  });
-
-  recordDecision(lineage, {
-    decision: "ALLOW",
-    violation: null,
-    reason: evaluation.reason || "Action authorized by policy."
   });
 
 
