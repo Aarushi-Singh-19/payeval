@@ -1,32 +1,36 @@
 const { evaluateAction } = require("./policy-engine");
 const { createExecutionTrace } = require("./execution-trace");
 const { evaluateIntent } = require("./intent-firewall");
+const {
+  createTransactionPassport,
+  verifyTransactionPassport
+} = require("./transaction-passport");
 
 /**
- * Enforce PAYEVAL policy before allowing an MCP tool invocation.
+ * Enforce PAYEVAL security policy before allowing an MCP tool invocation.
  *
- * Execution outcomes:
- * - BLOCKED: policy prevented execution
- * - APPROVAL_REQUIRED: policy requires human approval before execution
- * - EXECUTED_SUCCESS: policy allowed and MCP tool succeeded
- * - EXECUTED_FAILURE: policy allowed but MCP tool reported an error
- * - MCP_CONNECTION_FAILURE: policy allowed but MCP connection could not be established
+ * Security order:
  *
- * The MCP dependency can be supplied either as:
- * - an existing client with callTool(), or
- * - a factory function that creates the client only after ALLOW.
+ * 1. Intent verification
+ * 2. Policy evaluation
+ * 3. Human approval, when required
+ * 4. Transaction Passport creation / verification
+ * 5. MCP connection
+ * 6. MCP execution
  *
- * approvalHandler, when supplied, is called only after the policy
- * returns REQUIRE_APPROVAL and before any MCP connection is created.
+ * The Transaction Passport binds the final executable action to:
+ * - user intent
+ * - active policy
+ * - exact authorized action
  *
- * This preserves the security boundary:
- * BLOCK / pending approval / rejected approval -> MCP is never created.
+ * If any of these change before execution, PAYEVAL blocks the action.
  */
 async function enforceAction(
   scenario,
   actualAction,
   mcpClientOrFactory,
-  approvalHandler = null
+  approvalHandler = null,
+  transactionPassport = null
 ) {
   const startedAt = new Date().toISOString();
 
@@ -36,49 +40,62 @@ async function enforceAction(
   );
 
   const intentEvaluation =
-  scenario.intent
-    ? evaluateIntent(
-        scenario.intent,
-        actualAction
-      )
-    : null;
+    scenario.intent
+      ? evaluateIntent(
+          scenario.intent,
+          actualAction
+        )
+      : null;
 
-if (
-  intentEvaluation &&
-  intentEvaluation.decision === "BLOCK"
-) {
-  const completedAt = new Date().toISOString();
+  /*
+   * ------------------------------------------------------------
+   * 1. INTENT VERIFICATION
+   * ------------------------------------------------------------
+   */
 
-  const intentResult = {
-    status: "FAIL",
-    decision: "BLOCK",
-    reason: intentEvaluation.reason,
-    violation: intentEvaluation.violation,
-    exposure: evaluation.exposure,
-    risk: evaluation.risk
-  };
+  if (
+    intentEvaluation &&
+    intentEvaluation.decision === "BLOCK"
+  ) {
+    const completedAt = new Date().toISOString();
 
-  const trace = createExecutionTrace({
-    scenario,
-    actualAction,
-    evaluation: intentResult,
-    executionStatus: "BLOCKED",
-    executed: false,
-    toolSucceeded: false,
-    mcpResult: null,
-    startedAt,
-    completedAt
-  });
+    const intentResult = {
+      status: "FAIL",
+      decision: "BLOCK",
+      reason: intentEvaluation.reason,
+      violation: intentEvaluation.violation,
+      exposure: evaluation.exposure,
+      risk: evaluation.risk
+    };
 
-  return {
-    ...intentResult,
-    executionStatus: "BLOCKED",
-    executed: false,
-    toolSucceeded: false,
-    mcpResult: null,
-    trace
-  };
-}
+    const trace = createExecutionTrace({
+      scenario,
+      actualAction,
+      evaluation: intentResult,
+      executionStatus: "BLOCKED",
+      executed: false,
+      toolSucceeded: false,
+      mcpResult: null,
+      startedAt,
+      completedAt
+    });
+
+    return {
+      ...intentResult,
+      executionStatus: "BLOCKED",
+      executed: false,
+      toolSucceeded: false,
+      mcpResult: null,
+      transactionPassport: null,
+      trace
+    };
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * 2. POLICY BLOCK
+   * ------------------------------------------------------------
+   */
 
   if (evaluation.decision === "BLOCK") {
     const completedAt = new Date().toISOString();
@@ -101,9 +118,16 @@ if (
       executed: false,
       toolSucceeded: false,
       mcpResult: null,
+      transactionPassport: null,
       trace
     };
   }
+
+  /*
+   * ------------------------------------------------------------
+   * 3. HUMAN APPROVAL
+   * ------------------------------------------------------------
+   */
 
   if (evaluation.decision === "REQUIRE_APPROVAL") {
     if (typeof approvalHandler !== "function") {
@@ -127,6 +151,7 @@ if (
         executed: false,
         toolSucceeded: false,
         mcpResult: null,
+        transactionPassport: null,
         trace
       };
     }
@@ -158,17 +183,109 @@ if (
         executed: false,
         toolSucceeded: false,
         mcpResult: null,
+        transactionPassport: null,
         trace
       };
     }
   }
 
-  if (evaluation.decision !== "ALLOW" &&
-      evaluation.decision !== "REQUIRE_APPROVAL") {
+  if (
+    evaluation.decision !== "ALLOW" &&
+    evaluation.decision !== "REQUIRE_APPROVAL"
+  ) {
     throw new Error(
       `Invalid PayEval decision: ${evaluation.decision}`
     );
   }
+
+  /*
+   * ------------------------------------------------------------
+   * 4. TRANSACTION PASSPORT
+   * ------------------------------------------------------------
+   *
+   * A Passport is created only after policy and approval checks.
+   *
+   * If a caller supplied an existing Passport, it is verified
+   * against the CURRENT final action instead.
+   */
+
+  let activePassport = transactionPassport;
+
+  if (!activePassport) {
+    const passportIntent =
+      scenario.intent || {
+        tool: actualAction.tool,
+        amount: actualAction.arguments?.amount ?? null,
+        currency: actualAction.arguments?.currency ?? null,
+        target: actualAction.arguments?.receipt ?? null
+      };
+
+    activePassport = createTransactionPassport({
+      intent: passportIntent,
+      policy: scenario.policy,
+      action: actualAction
+    });
+  }
+
+  const passportIntent =
+    scenario.intent || {
+      tool: actualAction.tool,
+      amount: actualAction.arguments?.amount ?? null,
+      currency: actualAction.arguments?.currency ?? null,
+      target: actualAction.arguments?.receipt ?? null
+    };
+
+const passportVerification =
+  verifyTransactionPassport(
+    activePassport,
+    {
+      intent: passportIntent,
+      policy: scenario.policy,
+      action: actualAction,
+      consume: true
+    }
+  );
+
+  if (!passportVerification.valid) {
+    const completedAt = new Date().toISOString();
+
+    const passportResult = {
+      status: "FAIL",
+      decision: "BLOCK",
+      reason: passportVerification.reason,
+      violation: passportVerification.violation,
+      exposure: evaluation.exposure,
+      risk: "CRITICAL"
+    };
+
+    const trace = createExecutionTrace({
+      scenario,
+      actualAction,
+      evaluation: passportResult,
+      executionStatus: "BLOCKED",
+      executed: false,
+      toolSucceeded: false,
+      mcpResult: null,
+      startedAt,
+      completedAt
+    });
+
+    return {
+      ...passportResult,
+      executionStatus: "BLOCKED",
+      executed: false,
+      toolSucceeded: false,
+      mcpResult: null,
+      transactionPassport: activePassport,
+      trace
+    };
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * 5. MCP CONNECTION
+   * ------------------------------------------------------------
+   */
 
   let mcpClient;
 
@@ -200,26 +317,38 @@ if (
       executed: false,
       toolSucceeded: false,
       mcpResult: null,
+      transactionPassport: activePassport,
       trace
     };
   }
 
-  if (!mcpClient || typeof mcpClient.callTool !== "function") {
+  if (
+    !mcpClient ||
+    typeof mcpClient.callTool !== "function"
+  ) {
     throw new Error(
       "MCP client with callTool() is required for allowed actions."
     );
   }
+
+  /*
+   * ------------------------------------------------------------
+   * 6. FINAL EXECUTION
+   * ------------------------------------------------------------
+   */
 
   const mcpResult = await mcpClient.callTool({
     name: actualAction.tool,
     arguments: actualAction.arguments
   });
 
-  const toolSucceeded = mcpResult?.isError !== true;
+  const toolSucceeded =
+    mcpResult?.isError !== true;
 
-  const executionStatus = toolSucceeded
-    ? "EXECUTED_SUCCESS"
-    : "EXECUTED_FAILURE";
+  const executionStatus =
+    toolSucceeded
+      ? "EXECUTED_SUCCESS"
+      : "EXECUTED_FAILURE";
 
   const completedAt = new Date().toISOString();
 
@@ -241,6 +370,7 @@ if (
     executed: true,
     toolSucceeded,
     mcpResult,
+    transactionPassport: activePassport,
     trace
   };
 }
