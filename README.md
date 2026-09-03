@@ -16,30 +16,7 @@ The core question is:
 
 ## Core Principle
 
-```text
-AI AGENT
-   ↓
-USER INTENT
-   ↓
-INTENT FIREWALL
-   ↓
-POLICY ENGINE
-   ↓
-TRANSACTION PASSPORT
-   ↓
-ENFORCEMENT GATEWAY
-   ↓
-┌─────────────────┐
-│  ALLOW / BLOCK  │
-└────────┬────────┘
-         ↓
-MCP / RAZORPAY TEST MODE
-         ↓
-EXECUTION
-         ↓
-ACTION LINEAGE
-         ↓
-AUDITABLE RESULT
+<img width="5189" height="420" alt="mermaid-diagram" src="https://github.com/user-attachments/assets/c3f1a420-c626-45c4-823b-73936ac79481" />
 
 The agent proposes. PAYEVAL decides whether the exact financial action may execute.
 
@@ -89,7 +66,8 @@ Cryptographically bound Transaction Passports
 End-to-end Action Lineage
 PAYEVAL-FIN benchmark evaluation
 Razorpay Test Mode execution
-Security lifecycle
+Security lifecycle verification
+Security Lifecycle
 PREVENT
    ↓
 ATTACK
@@ -125,7 +103,7 @@ Unauthorized financial actions
 
 The enforcement gateway performs these checks before external execution.
 
-Authorization spoof protection
+Authorization Spoof Protection
 
 Trusted authorization context is authoritative when explicitly supplied.
 
@@ -137,8 +115,7 @@ An agent cannot manufacture authorization simply by claiming:
 
 when trusted authorization is absent.
 
-Verified result:
-
+Verified Result
 Decision: BLOCK
 Violation: UNAUTHORIZED_FINANCIAL_ACTION
 Executed: false
@@ -184,9 +161,7 @@ Authorization / passport validation
 BLOCK or ALLOW
     ↓
 Only ALLOW can reach MCP
-
-Example:
-
+Example
 Intent:        ₹500 INR
 Agent proposes: ₹5,000 INR
 
@@ -214,7 +189,7 @@ Argument removal
 Argument type confusion
 Autonomous-limit bypass
 Approval bypass
-Verified result
+Verified Result
 10 attacks generated
 10 attacks blocked
 0 bypasses
@@ -240,7 +215,7 @@ Removing allowed tools
 Removing currency restrictions
 Removing required arguments
 Raising approval thresholds
-Verified result
+Verified Result
 Mutations tested:    7
 Mutations killed:    7
 Mutations survived:  0
@@ -293,7 +268,7 @@ Replay attempt
 Amount tampering
 Policy tampering
 Expired authorization
-Known limitation
+Known Limitation
 
 Passport consumption is currently in-memory.
 
@@ -322,9 +297,7 @@ External reference
 Violations
 Timeline
 Lineage summary
-
-Example:
-
+Example Timeline
 ENFORCEMENT_STARTED
         ↓
 POLICY_DECISION
@@ -358,7 +331,7 @@ Authorized payment above absolute limit
 Unauthorized tool
 Missing required amount
 Payment requiring approval
-Verified result
+Verified Result
 Scenarios:  9
 Passed:     9
 Failed:     0
@@ -409,7 +382,7 @@ A real Razorpay Test Mode order creation has been verified.
 No production credentials, real-money transactions, or real customer payment data are required.
 
 End-to-End Security Proof
-Authorized action
+Authorized Action
 User intent
 ₹500 INR
     ↓
@@ -427,7 +400,7 @@ EXECUTED_SUCCESS
     ↓
 Action Lineage
 RECORDED
-Tampered action
+Tampered Action
 User intent
 ₹500 INR
     ↓
@@ -444,7 +417,7 @@ MCP
     ↓
 Execution
 NOT_ATTEMPTED
-Core security proof
+Core Security Proof
 
 Unsafe financial actions are stopped before external tool execution.
 
@@ -472,7 +445,7 @@ Threat Model
 
 PAYEVAL focuses on the boundary between an AI agent's proposed financial action and external financial execution.
 
-Covered by current tests
+Covered by Current Tests
 Unauthorized financial actions
 Authorization spoofing
 Tool substitution
@@ -487,7 +460,7 @@ Transaction replay
 Transaction-action tampering
 Policy tampering
 Execution leakage
-Not claimed
+Not Claimed
 
 PAYEVAL does not claim:
 
@@ -572,9 +545,7 @@ Quick Start
 Install dependencies:
 
 npm install
-
-Run the core regression suite:
-
+Run the Core Regression Suite
 node evaluator/test-policy-engine.js
 node evaluator/test-adversarial-authorization.js
 node evaluator/test-intent-drift.js
@@ -582,25 +553,15 @@ node evaluator/test-transaction-passport.js
 node evaluator/test-transaction-passport-gateway.js
 node evaluator/test-action-lineage.js
 node evaluator/test-action-lineage-gateway.js
-
-Run Attack My Agent:
-
+Run Attack My Agent
 node evaluator/attack-my-agent.js
-
-Run policy mutation testing:
-
+Run Policy Mutation Testing
 node evaluator/policy-mutation-testing.js
-
-Run the benchmark:
-
+Run the Benchmark
 node evaluator/benchmark.js
-
-Generate the dashboard:
-
+Generate the Dashboard
 node reports/generate-dashboard.js
-
-Generate the Action Lineage report:
-
+Generate the Action Lineage Report
 node reports/generate-lineage-report.js
 node reports/generate-lineage-html.js
 Repository Structure
@@ -648,7 +609,7 @@ payeval/
 │
 └── scenarios/
 Project Status
-Core implementation: Feature Complete
+Core Implementation: Feature Complete
 
 PAYEVAL's implementation is frozen for final submission preparation.
 
@@ -701,4 +662,3 @@ Do not use production credentials, real customer data, or real-money payment flo
 License
 
 ISC
-
