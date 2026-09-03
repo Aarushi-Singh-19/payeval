@@ -702,11 +702,3 @@ License
 
 ISC
 
-
-### One thing I deliberately changed
-
-I **did not put "INTENT FINGERPRINT" anywhere** because we don't have a separate component with that name.
-
-I also avoided claims like **"production-ready," "immutable audit," "exhaustive security,"** or **"distributed replay protection."**
-
-This version is the one I would put on the public GitHub repository.
